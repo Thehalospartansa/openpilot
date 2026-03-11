@@ -1,0 +1,66 @@
+name: sunnypilot docs
+
+on:
+  push:
+    branches:
+      - docs
+    paths:
+      - 'docs_sp/**'
+      - 'mkdocs-sp.yml'
+  pull_request:
+    paths:
+      - 'docs_sp/**'
+      - 'mkdocs-sp.yml'
+
+concurrency:
+  group: docs-sp-${{ github.event_name == 'push' && github.ref == 'refs/heads/docs' && github.run_id || github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: build sunnypilot docs
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        pip install uv
+        uv pip install --system zensical
+
+    - name: Build docs
+      run: zensical build -f mkdocs-sp.yml
+
+    # Push to docs.sunnypilot.ai
+    - uses: actions/checkout@v6
+      if: github.ref == 'refs/heads/docs' && github.repository == 'sunnypilot/sunnypilot'
+      with:
+        path: sunnypilot-docs
+        ssh-key: ${{ secrets.OPENPILOT_DOCS_KEY }}
+        repository: sunnypilot/sunnypilot-docs
+
+    - name: Push to GitHub Pages
+      if: github.ref == 'refs/heads/docs' && github.repository == 'sunnypilot/sunnypilot'
+      run: |
+        set -x
+
+        source release/identity.sh
+
+        cd sunnypilot-docs
+        git checkout --orphan tmp
+        git rm -rf .
+
+        cp -r ../docs_site_sp/ docs/
+
+        touch docs/.nojekyll
+        echo -n docs.sunnypilot.ai > docs/CNAME
+
+        git add -f .
+        git commit -m "build sunnypilot docs"
+
+        git push -f origin tmp:gh-pages

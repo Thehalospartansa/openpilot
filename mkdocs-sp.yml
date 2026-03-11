@@ -1,0 +1,151 @@
+site_name: sunnypilot docs
+repo_name: sunnypilot/sunnypilot
+repo_url: https://github.com/sunnypilot/sunnypilot/
+site_description: sunnypilot Documentation
+site_url: https://docs.sunnypilot.ai
+edit_uri: blob/docs/docs_sp
+
+exclude_docs: README.md
+
+strict: true
+docs_dir: docs_sp
+site_dir: docs_site_sp/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - scheme: default
+      media: "(prefers-color-scheme: light)"
+      primary: deep purple
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      media: "(prefers-color-scheme: dark)"
+      primary: deep purple
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  font:
+    text: Open Sans
+    code: Fira Code
+  logo: assets/sp_logo.svg
+  favicon: assets/sp_logo.svg
+  features:
+    - content.code.copy
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+
+extra_css:
+  - stylesheets/style.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: sunnypilot
+      repo: sunnypilot
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+      clickable_checkbox: true
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - What is sunnypilot?: getting-started/what-is-sunnypilot.md
+      - Use sunnypilot in a car: getting-started/use-sunnypilot-in-a-car.md
+      - Setup:
+          - Read before installing: setup/read-before-installing.md
+          - URL Method: setup/url-method.md
+          - SSH Method: setup/ssh-method.md
+  - Features:
+      - Cruise Control:
+          - Intelligent Cruise Button Management: features/icbm.md
+          - Smart Cruise Control - Vision: features/scc-v.md
+          - Smart Cruise Control - Map: features/scc-m.md
+          - Custom ACC Increments: features/custom-acc-increments.md
+          - Dynamic Experimental Control: features/dynamic-experimental-control.md
+          - Speed Limit Control: features/speed-limit.md
+      - Steering:
+          - Modular Assistive Driving System: features/mads.md
+          - Neural Network Lateral Control: features/nnlc.md
+          - Auto Lane Change: features/auto-lane-change.md
+          - Torque Control: features/torque-control.md
+      - Display & Visuals:
+          - Onroad Display: features/onroad-display.md
+          - HUD & Visuals: features/hud-visuals.md
+      - Models & AI: features/models.md
+      - OSM Maps: features/osm-maps.md
+  - Settings Reference:
+      - Cruise Control: settings/cruise.md
+      - Speed Limit: settings/speed-limit.md
+      - Steering: settings/steering.md
+      - MADS: settings/mads.md
+      - Lane Change: settings/lane-change.md
+      - Torque: settings/torque.md
+      - Display: settings/display.md
+      - Visuals & HUD: settings/visuals.md
+      - Device: settings/device.md
+      - Models & AI: settings/models.md
+      - OSM Maps: settings/osm.md
+      - Software: settings/software.md
+      - Developer: settings/developer.md
+      - Vehicle-Specific:
+          - Tesla: settings/vehicle/tesla.md
+          - Toyota: settings/vehicle/toyota.md
+          - Hyundai: settings/vehicle/hyundai.md
+          - Subaru: settings/vehicle/subaru.md
+  - Community:
+      - Contributing: community/contributing.md
+      - Workflow: community/workflow.md
+      - Reporting a Bug: community/reporting-a-bug.md
+      - Discord Community: https://discord.sunnypilot.ai
+  - Safety:
+      - Safety Information: safety/safety.md
+      - Prohibited Modifications: safety/prohibited-modifications.md
+  - References:
+      - Recommended Branches: references/recommended-branches.md
+      - Branch Definitions: references/branch-definitions.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/sunnypilot/sunnypilot
+    - icon: fontawesome/brands/discord
+      link: https://discord.sunnypilot.ai

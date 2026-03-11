@@ -15,6 +15,7 @@ a.out
 .cache/
 
 /docs_site/
+/docs_site_sp/
 
 *.mp4
 *.dylib

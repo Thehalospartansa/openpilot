@@ -1,0 +1,41 @@
+---
+title: Neural Network Lateral Control
+---
+
+# Neural Network Lateral Control (NNLC)
+
+## What It Does
+
+NNLC replaces the traditional PID or torque-based steering controller with a neural network trained on real driving data. This can provide smoother, more natural-feeling lane keeping that adapts to your vehicle's steering characteristics.
+
+## How It Works
+
+Instead of using fixed mathematical formulas (PID controller), NNLC uses a machine learning model to calculate steering commands. The neural network has been trained on real-world driving data and can handle a wider variety of driving scenarios with smoother output.
+
+## Requirements
+
+!!! info "Requirements"
+    - Vehicle must not use angle-based steering (`steerControlType` must not be `angle`)
+    - Mutually exclusive with [Torque Control](torque-control.md) — only one can be active at a time
+    - Device must be offroad to enable/disable
+
+## How to Enable
+
+**Settings** → **sunnypilot** → **Steering** → **Neural Network Lateral Control**
+
+!!! tip
+    Not all vehicles have NNLC models available. If the toggle does not appear, your vehicle may use angle-based steering which is not compatible with NNLC.
+
+## NNLC vs. Torque Control
+
+| Feature | NNLC | Torque Control |
+|---------|------|---------------|
+| **Approach** | Neural network (learned) | Mathematical formula (tuned) |
+| **Customization** | Automatic | Manual tuning available |
+| **Best for** | Smooth, adaptive steering | Precise, configurable steering |
+
+These two features are mutually exclusive — enabling one automatically disables the other.
+
+## Settings Reference
+
+See [Steering Settings](../settings/steering.md) for configuration details.
