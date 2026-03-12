@@ -13,7 +13,7 @@ Help us improve sunnypilot by reporting issues you encounter.
 
 1. **Upgrade** to the latest version — the bug may already be fixed
 2. **Remove customizations** — reproduce on a stock official branch
-3. **Search** [GitHub Issues](https://github.com/sunnypilot/sunnypilot/issues) and the [Discord Community](https://discord.sunnypilot.ai) for known reports
+3. **Search** [GitHub Issues](https://github.com/sunnypilot/sunnypilot/issues) and the [sunnypilot community forum](https://community.sunnypilot.ai) for known reports
 4. **Preserve the route** — upload raw logs via [Comma Connect](https://connect.comma.ai) and keep the route available
 
 ## What to Include

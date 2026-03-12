@@ -25,11 +25,14 @@ Navigate to **Settings** → **Software** → **Disable Updates** and toggle it 
 
 This prevents the device from automatically pulling and applying updates from the remote branch.
 
+!!! note "Offroad Only"
+    The Disable Updates toggle can only be changed while the device is **offroad** (not actively driving). If you are in a drive, complete the drive first and return to the home screen before changing this setting.
+
 ### 3. Reboot the Device
 
 Navigate to **Settings** → **Device** → **Reboot** to restart the device.
 
-The reboot applies the settings change and ensures the update service is fully stopped.
+The reboot applies the settings change and ensures the update service is fully stopped. A confirmation dialog will appear before the reboot proceeds.
 
 ### 4. Verify
 

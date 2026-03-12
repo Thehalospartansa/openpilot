@@ -21,13 +21,25 @@ With MADS enabled, Automatic Lane Centering (ALC) and Adaptive Cruise Control (A
 
 ### Engagement States
 
-MADS introduces distinct states that reflect how the driver and system interact:
+MADS has five internal states:
 
 | State | Description |
 |-------|-------------|
-| **Active** | Steering assistance is fully engaged and actively providing lane centering |
-| **Paused** | Steering assistance is temporarily paused (e.g., due to certain conditions) but can resume without re-engaging |
+| **Disabled** | MADS is off — no steering assistance is provided |
+| **Enabled** | Steering assistance is fully engaged and actively providing lane centering |
+| **Paused** | Steering assistance is temporarily paused (e.g., due to braking, depending on your Steering Mode on Brake setting) but can resume without re-engaging |
+| **Soft Disabling** | The system is transitioning from enabled to disabled due to a safety condition (e.g., driver inattention alert escalation) |
 | **Overriding** | The driver is actively steering, temporarily overriding the system's lateral input. Steering assistance resumes when the driver releases the wheel |
+
+### Steering Mode on Brake
+
+This setting controls what happens to steering assistance when the brake pedal is pressed:
+
+| Option | Value | Behavior |
+|--------|-------|----------|
+| **Remain Active** | 0 | Steering stays fully active while braking |
+| **Pause** | 1 | Steering pauses while braking, resumes on release |
+| **Disengage** | 2 | Steering fully disengages on brake — must re-engage manually |
 
 ## Requirements
 
@@ -46,21 +58,25 @@ Then configure the sub-settings in **MADS Settings**.
 |---------|-----------------|
 | **Main Cruise Allowed** | Whether the cruise on/off button can activate MADS |
 | **Unified Engagement Mode** | Whether engaging cruise also engages MADS automatically |
+| **Steering Mode on Brake** | What happens to steering when the brake is pressed (Remain Active / Pause / Disengage) |
 | **Steering Mode on Disengage** | What happens to steering when cruise disengages |
 
 ## Vehicle-Specific Behavior
 
-Some vehicles operate in **limited MADS mode** where certain settings are locked:
+Some vehicles operate in **limited MADS mode** where certain settings are locked due to platform constraints (e.g., no vehicle bus access):
 
 === "Tesla (without vehicle bus)"
     - Main Cruise Allowed: forced OFF
     - Unified Engagement Mode: forced ON
-    - Steering Mode: forced to Disengage
+    - Steering Mode on Brake: forced to **Disengage**
 
 === "Rivian"
     - Main Cruise Allowed: forced OFF
     - Unified Engagement Mode: forced ON
-    - Steering Mode: forced to Disengage
+    - Steering Mode on Brake: forced to **Disengage**
+
+!!! note "Why these restrictions?"
+    Vehicles without a full vehicle bus connection (like Tesla without the vehicle bus harness and Rivian) cannot reliably detect certain driver inputs. To maintain safety, MADS defaults to the most conservative behavior on these platforms.
 
 ## Settings Reference
 

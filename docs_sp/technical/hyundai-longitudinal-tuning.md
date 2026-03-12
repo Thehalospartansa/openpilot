@@ -25,7 +25,7 @@ The longitudinal tuning for HKG vehicles targets the following objectives:
 
 ## Standards Reference
 
-The tuning implementation references **ISO 15622** (Intelligent Transport Systems — Adaptive Cruise Control Systems — Performance Requirements and Test Procedures). This standard defines:
+The tuning implementation references **ISO 15622:2018** (Intelligent Transport Systems — Adaptive Cruise Control Systems — Performance Requirements and Test Procedures). This standard defines:
 
 - Maximum and minimum acceleration/deceleration rates for ACC systems
 - Response time requirements for speed changes
@@ -36,13 +36,37 @@ The tuning implementation references **ISO 15622** (Intelligent Transport System
 
 ### Jerk Limiting
 
-**Jerk** is the rate of change of acceleration (m/s^3). High jerk values produce the "jerky" feeling passengers experience during abrupt speed changes.
+**Jerk** is the rate of change of acceleration (m/s³). High jerk values produce the "jerky" feeling passengers experience during abrupt speed changes.
 
 The tuning system limits jerk to keep acceleration transitions smooth:
+
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| **Minimum jerk** | 0.5 m/s³ | Floor value — jerk is never reduced below this to maintain responsiveness |
+| **Default jerk limit** | 4.0 m/s³ | Standard upper bound for jerk across most driving scenarios |
 
 - Acceleration onset is ramped gradually rather than applied instantly
 - Deceleration transitions are similarly smoothed to avoid sudden braking sensations
 - Different jerk limits apply to different driving scenarios (e.g., following vs. stopping)
+
+#### Per-Vehicle Jerk Overrides
+
+Some vehicle models have custom jerk limits tuned to their specific powertrain characteristics:
+
+| Vehicle | Jerk Limit (m/s³) | Reason |
+|---------|-------------------|--------|
+| **Kia Niro EV** | 3.3 | EV powertrain delivers instant torque; lower jerk limit prevents harsh acceleration onset |
+| **Kia Niro PHEV (2022+)** | 5.0 | Hybrid powertrain benefits from slightly higher jerk allowance for smoother transitions between electric and ICE modes |
+
+#### Type-Specific Overrides
+
+Jerk limits and acceleration profiles are also adjusted by vehicle communication type:
+
+| Type | Adjustment |
+|------|------------|
+| **CAN-FD** | Tuning adapted for CAN-FD protocol timing and message rates |
+| **EV** | Lower default jerk limits to account for instant torque delivery |
+| **Hybrid** | Adjusted profiles to handle transitions between electric and combustion modes |
 
 ### Parabolic Approach
 
@@ -74,12 +98,23 @@ The system adapts its behavior based on the lead vehicle's actions:
 - **Lead cut-in**: Timely but smooth deceleration to establish safe following distance
 - **Lead cut-out**: Controlled acceleration to resume set speed
 
+## Panda Safety Limits
+
+The panda enforces hard acceleration limits at the firmware level that cannot be overridden:
+
+| Parameter | Limit |
+|-----------|-------|
+| **Maximum acceleration** | +2.0 m/s² |
+| **Maximum deceleration** | -3.5 m/s² |
+
+All tuning parameters must produce acceleration commands within these bounds. Any command exceeding these limits is clamped by the panda safety layer.
+
 ## Technical Parameters
 
 The tuning system uses several categories of parameters:
 
 - **Acceleration bounds**: Maximum and minimum acceleration values at different speeds
-- **Jerk limits**: Rate-of-change constraints for both positive and negative acceleration
+- **Jerk limits**: Rate-of-change constraints for both positive and negative acceleration (min: 0.5, default max: 4.0 m/s³)
 - **Time constants**: Filtering and smoothing time constants for acceleration commands
 - **Following distance gains**: Speed-dependent proportional and derivative gains for gap control
 - **Stopping parameters**: Deceleration profiles and creep behavior for stop-and-go

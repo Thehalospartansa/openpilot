@@ -23,14 +23,41 @@ ICBM is designed specifically for vehicles where sunnypilot cannot directly cont
 
 This happens transparently — from your perspective, the buttons work normally but with smarter behavior. Under the hood, ICBM is communicating with the vehicle's cruise control module by simulating physical button presses on the CAN bus, which is why it works even on vehicles without direct throttle/brake control.
 
+### State Machine
+
+ICBM operates through a 5-state machine:
+
+| State | Description |
+|-------|-------------|
+| **Inactive** | ICBM is idle — no button simulation is in progress |
+| **Pre-Active** | A speed change has been requested; ICBM is preparing to simulate button presses |
+| **Increasing** | ICBM is sending "speed up" button presses to reach the target speed |
+| **Decreasing** | ICBM is sending "speed down" button presses to reach the target speed |
+| **Holding** | Target speed has been reached; ICBM is holding the current setting |
+
 !!! tip "Safety"
-    ICBM preserves all of your vehicle's stock safety systems. Forward Collision Avoidance (FCA), Automatic Emergency Braking (AEB), and other factory safety features remain fully active and unaffected, since the vehicle's own cruise control system is still performing the actual speed control.
+    ICBM preserves all of your vehicle's stock safety systems. Forward Collision Avoidance (FCA), Automatic Emergency Braking (AEB), and other factory safety features remain fully active and unaffected, since the vehicle's own cruise control system is still performing the actual speed control. ICBM operates purely at the CAN bus button simulation level and does not interact with FCA or AEB message pathways.
+
+## Supported Vehicles
+
+ICBM support varies by vehicle brand. The feature toggle only appears in settings if your vehicle is supported.
+
+| Brand | Notes |
+|-------|-------|
+| **Hyundai / Kia / Genesis** | Supported on most models with stock cruise control |
+| **Honda / Acura** | Supported on compatible models |
+| **Chrysler / Dodge / Jeep / RAM** | Supported on compatible models |
+| **Mazda** | Supported on compatible models |
+
+!!! info "Not Listed?"
+    If your brand or model is not listed above and the ICBM toggle does not appear in your settings, your vehicle is not currently supported. Support depends on the vehicle's CAN bus protocol and button command structure.
 
 ## Requirements
 
 !!! info "Requirements"
     - Your vehicle must support ICBM — not all vehicles are compatible
     - If the ICBM toggle does not appear in settings, your vehicle is not supported
+    - **Mutually exclusive with [Alpha Longitudinal](alpha-longitudinal.md)** — only one can be active at a time
 
 ## How to Enable
 

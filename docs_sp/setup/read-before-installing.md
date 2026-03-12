@@ -38,5 +38,5 @@ Before installing sunnypilot, please review the following important information.
 
 If you run into issues:
 
-- Join the [Discord Community](https://discord.sunnypilot.ai)
+- Visit the [sunnypilot community forum](https://community.sunnypilot.ai)
 - Check [Reporting a Bug](../community/reporting-a-bug.md) for how to submit issues

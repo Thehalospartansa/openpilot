@@ -19,9 +19,32 @@ The following modifications to panda safety logic are strictly prohibited:
 - **Removing steering torque limits** — Modifying or removing the safety-enforced steering torque limits is prohibited.
 - **Bypassing vehicle safety interlocks** — Disabling or circumventing any vehicle-level safety interlock is prohibited.
 
+### Panda Safety Limits (Example: Hyundai/Kia/Genesis)
+
+The panda enforces hard acceleration limits that cannot be overridden by software:
+
+| Parameter | Limit |
+|-----------|-------|
+| **Maximum acceleration** | +2.0 m/s² |
+| **Maximum deceleration** | -3.5 m/s² |
+
+These limits are enforced at the hardware level by the panda safety firmware. Any attempt to exceed these limits is blocked regardless of what the software commands.
+
 ## Driver Monitoring Violations
 
 - **Reducing or weakening driver monitoring parameters** — Any modification that lowers the sensitivity, delays the response, or otherwise weakens the driver monitoring system is prohibited. This includes increasing allowed distraction time, reducing alert thresholds, or disabling monitoring entirely.
+
+### Driver Monitoring Escalation Timeline
+
+The driver monitoring system follows a strict escalation timeline:
+
+| Phase | Timeout | Description |
+|-------|---------|-------------|
+| **Active monitoring** | 11 seconds | Time before the first distraction alert when the driver is not looking at the road |
+| **Passive monitoring** | 30 seconds | Time before an alert when the driver's face is not detected (e.g., face covered or camera obstructed) |
+| **Terminal alerts** | 3 strikes | After 3 terminal-level alerts (driver unresponsive), the system locks out and requires a full restart |
+
+Modifying any of these thresholds to be more permissive is strictly prohibited.
 
 ## General Prohibitions
 

@@ -36,7 +36,7 @@ theme:
     text: Open Sans
     code: Fira Code
   logo: assets/logo.png
-  favicon: assets/logo.png
+  favicon: assets/favicon.png
   features:
     - content.code.copy
     - navigation.tabs
@@ -136,7 +136,7 @@ nav:
       - Contributing: community/contributing.md
       - Workflow: community/workflow.md
       - Reporting a Bug: community/reporting-a-bug.md
-      - Discord Community: https://discord.sunnypilot.ai
+      - Community Forum: https://community.sunnypilot.ai
   - How-To Guides:
       - Share a Route: how-to/share-a-route.md
       - Preserve Local File Changes: how-to/preserve-local-changes.md
@@ -154,5 +154,5 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/sunnypilot/sunnypilot
-    - icon: fontawesome/brands/discord
-      link: https://discord.sunnypilot.ai
+    - icon: fontawesome/solid/comments
+      link: https://community.sunnypilot.ai

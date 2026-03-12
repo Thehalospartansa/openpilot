@@ -6,28 +6,51 @@ title: Speed Limit Assist
 
 ## What It Does
 
-Speed Limit Assist detects the current speed limit using map data and can automatically adjust your cruise speed to match. It offers four operating modes ranging from passive information display to active speed management.
+Speed Limit Assist detects the current speed limit and can automatically adjust your cruise speed to match. It offers four operating modes ranging from passive information display to active speed management.
 
 ## How It Works
 
-1. sunnypilot reads speed limit data from one or more configured sources (see below)
-2. Based on your chosen mode, it displays, warns, or actively adjusts your set speed
-3. When a speed limit change is detected, the system either applies it automatically or prompts you to confirm, depending on the confirmation mode
+1. sunnypilot reads speed limit data from two sources (see below)
+2. A configurable **Speed Limit Policy** determines how the sources are combined when both are available
+3. Based on your chosen mode, the system displays, warns, or actively adjusts your set speed
 4. An optional offset (fixed or percentage) lets you cruise slightly above or below the limit
 
 ## Speed Limit Sources
 
-Speed Limit Assist can pull speed limit data from multiple sources. You can configure which source takes priority via the **Speed Limit Policy** setting.
+Speed Limit Assist pulls speed limit data from **two sources**:
 
 | Source | Description |
 |--------|-------------|
-| **OSM Map Data** | Speed limits from downloaded OpenStreetMap data. Requires [OSM Maps](osm-maps.md) to be configured and downloaded. |
-| **Car's Stock Speed Limit Data** | Some vehicles provide speed limit information from their built-in sensors (e.g., Traffic Sign Recognition cameras). Availability depends on the vehicle. |
-| **Navigation Data** | Speed limits embedded in navigation route data, when a navigation destination is active. |
-| **Camera Vision** | Speed limit signs detected by the device's road-facing camera using the vision model. |
+| **Car State** | Speed limit information provided by the vehicle's built-in sensors (e.g., Traffic Sign Recognition cameras). Availability depends on the vehicle. |
+| **Map Data** | Speed limits from downloaded OpenStreetMap data. Requires [OSM Maps](osm-maps.md) to be configured and downloaded. |
 
-!!! tip "Source Priority"
-    When multiple sources detect different speed limits, the **Speed Limit Policy** setting determines which source is used. Configure this under **Settings** → **sunnypilot** → **Cruise Control** → **Speed Limit Policy**.
+### Speed Limit Policy
+
+When both sources are available and report different values, the **Speed Limit Policy** setting determines which source is used:
+
+| Policy | Behavior |
+|--------|----------|
+| **Car State Only** | Uses only the vehicle's built-in speed limit data; ignores map data |
+| **Map Data Only** | Uses only OSM map speed limit data; ignores car state |
+| **Car State Priority** | Uses car state data when available; falls back to map data |
+| **Map Data Priority** | Uses map data when available; falls back to car state |
+| **Combined** | Uses the highest-confidence value from either source |
+
+## Operating Modes
+
+| Mode | Behavior |
+|------|----------|
+| **Off** | Speed limit data is not used |
+| **Information** | Shows the current speed limit on the driving display |
+| **Warning** | Shows the speed limit and alerts you when you're exceeding it |
+| **Assist** | Automatically adjusts cruise speed to match the speed limit |
+
+## Speed Offset
+
+You can set an offset so your cruise speed differs from the exact limit:
+
+- **Fixed offset:** Add or subtract a set number of km/h or mph (range: -30 to +30)
+- **Percentage offset:** Apply a percentage above or below the limit
 
 ## Confirmation Modes
 
@@ -56,26 +79,10 @@ Speed Limit Assist provides visual indicators on the driving HUD:
 
 **Settings** → **sunnypilot** → **Cruise Control** → **Speed Limit Assist**
 
-## Operating Modes
-
-| Mode | Behavior |
-|------|----------|
-| **Off** | Speed limit data is not used |
-| **Info** | Shows the current speed limit on the driving display |
-| **Warning** | Shows the speed limit and alerts you when you're exceeding it |
-| **Assist** | Automatically adjusts cruise speed to match the speed limit |
-
-## Speed Offset
-
-You can set an offset so your cruise speed differs from the exact limit:
-
-- **Fixed offset:** Add or subtract a set number of km/h or mph (range: -30 to +30)
-- **Percentage offset:** Apply a percentage above or below the limit
-
 ## Vehicle Restrictions
 
 !!! warning "Vehicle Restrictions"
-    - **Tesla:** Assist mode is disabled on release branches (Info and Warning still work)
+    - **Tesla:** Assist mode is disabled on release branches (Information and Warning still work)
     - **Rivian:** Assist mode is always disabled
 
 ## Settings Reference

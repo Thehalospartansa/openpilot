@@ -11,7 +11,7 @@ We welcome contributions from the community! Here's how you can help.
 - **Report bugs** — See [Reporting a Bug](reporting-a-bug.md)
 - **Submit code** — Follow the [Workflow](workflow.md) guide
 - **Improve documentation** — Submit PRs to the `docs` branch
-- **Help others** — Join the [Discord Community](https://discord.sunnypilot.ai)
+- **Help others** — Join the [sunnypilot community forum](https://community.sunnypilot.ai)
 
 ## Code of Conduct
 

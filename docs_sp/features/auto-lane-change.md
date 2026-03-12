@@ -17,7 +17,7 @@ Automatically executes lane changes when you activate the turn signal. You can c
     - **Nudge:** Give a light steering nudge to confirm the lane change
     - **Nudgeless:** The lane change begins immediately
     - **Timed (0.5s–3s):** The lane change begins after the configured delay
-5. If BSM Delay is enabled and a vehicle is detected in your blind spot, the lane change waits until the path is clear
+5. If BSM Delay is enabled and a vehicle is detected in your blind spot, the lane change is delayed by an additional 1 second beyond the configured timer
 
 ## Requirements
 
@@ -33,16 +33,19 @@ Automatically executes lane changes when you activate the turn signal. You can c
 
 ## Modes
 
-| Mode | Behavior |
-|------|----------|
-| **Off** | Auto lane change is disabled |
-| **Nudge** | Requires a light steering nudge to confirm |
-| **Nudgeless** | Lane change begins as soon as you signal |
-| **0.5s – 3s** | Lane change begins after a set delay |
+| Mode | Value | Behavior |
+|------|-------|----------|
+| **Off** | -1 | Auto lane change is disabled |
+| **Nudge** | 0 | Requires a light steering nudge to confirm the lane change |
+| **Nudgeless** | 1 | Lane change begins as soon as you signal |
+| **0.5 second** | 2 | Lane change begins after 0.5s delay |
+| **1 second** | 3 | Lane change begins after 1s delay |
+| **2 seconds** | 4 | Lane change begins after 2s delay |
+| **3 seconds** | 5 | Lane change begins after 3s delay |
 
 ## Blind Spot Monitoring Integration
 
-If your vehicle supports BSM and the BSM Delay option is enabled, the system checks for vehicles in your blind spot before executing the lane change. The lane change is delayed until the adjacent lane is clear.
+If your vehicle supports BSM and the BSM Delay option is enabled, the system checks for vehicles in your blind spot before executing the lane change. When a vehicle is detected in the blind spot, the lane change is delayed by an additional **1 second** on top of the configured timer until the adjacent lane is clear.
 
 !!! info "BSM Requirements"
     - Vehicle must support Blind Spot Monitoring

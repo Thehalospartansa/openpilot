@@ -6,8 +6,11 @@ Source files for [docs.sunnypilot.ai](https://docs.sunnypilot.ai).
 
 ### Install dependencies
 
+Install docs dependencies only - do **not** use `uv pip install .[docs]` as it will
+reinstall the full sunnypilot package and break the development environment.
+
 ```bash
-uv pip install .[docs]
+uv pip install Jinja2 mkdocs zensical
 ```
 
 ### Build
