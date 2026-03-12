@@ -81,8 +81,6 @@ dependencies = [
 
 [project.optional-dependencies]
 docs = [
-  "Jinja2",
-  "mkdocs",
   "zensical",
 ]
 

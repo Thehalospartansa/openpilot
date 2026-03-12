@@ -6,11 +6,11 @@ on:
       - docs
     paths:
       - 'docs_sp/**'
-      - 'mkdocs-sp.yml'
+      - 'zensical.toml'
   pull_request:
     paths:
       - 'docs_sp/**'
-      - 'mkdocs-sp.yml'
+      - 'zensical.toml'
 
 concurrency:
   group: docs-sp-${{ github.event_name == 'push' && github.ref == 'refs/heads/docs' && github.run_id || github.head_ref || github.ref }}
@@ -34,7 +34,7 @@ jobs:
         uv pip install --system zensical
 
     - name: Build docs
-      run: zensical build -f mkdocs-sp.yml
+      run: zensical build
 
     # Push to docs.sunnypilot.ai
     - uses: actions/checkout@v6

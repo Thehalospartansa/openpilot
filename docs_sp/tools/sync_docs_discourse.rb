@@ -27,13 +27,14 @@ require "yaml"
 require "digest"
 require "fileutils"
 require "optparse"
+require "toml-rb"
 
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
 
 DOCS_DIR       = File.expand_path("../../", __FILE__)  # docs_sp/
-MKDOCS_YML     = File.expand_path("../../../mkdocs-sp.yml", __FILE__)
+MKDOCS_YML     = File.expand_path("../../../zensical.toml", __FILE__)
 CACHE_DIR      = File.expand_path("../../../.discourse_sync_cache", __FILE__)
 DOCS_BASE_URL  = ENV.fetch("DOCS_BASE_URL", "https://docs.sunnypilot.ai")
 
@@ -409,16 +410,16 @@ module DiscourseAPI
 end
 
 # ---------------------------------------------------------------------------
-# Nav Parser — extract title + path from mkdocs-sp.yml nav
+# Nav Parser — extract title + path from zensical.toml nav
 # ---------------------------------------------------------------------------
 
 module NavParser
   module_function
 
-  # Parse the mkdocs nav structure into a flat list of { title:, path: }
-  def parse(mkdocs_yml_path)
-    config = YAML.safe_load(File.read(mkdocs_yml_path))
-    nav = config["nav"] || []
+  # Parse the zensical.toml nav structure into a flat list of { title:, path: }
+  def parse(config_path)
+    config = TomlRB.load_file(config_path)
+    nav = config.dig("project", "nav") || []
     flatten_nav(nav)
   end
 

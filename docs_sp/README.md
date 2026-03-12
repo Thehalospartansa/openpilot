@@ -6,23 +6,20 @@ Source files for [docs.sunnypilot.ai](https://docs.sunnypilot.ai).
 
 ### Install dependencies
 
-Install docs dependencies only - do **not** use `uv pip install .[docs]` as it will
-reinstall the full sunnypilot package and break the development environment.
-
 ```bash
-uv pip install Jinja2 mkdocs zensical
+uv pip install ".[docs]"
 ```
 
 ### Build
 
 ```bash
-zensical build -f mkdocs-sp.yml
+zensical build
 ```
 
 ### Serve locally
 
 ```bash
-zensical serve -f mkdocs-sp.yml
+zensical serve
 ```
 
 The site will be available at `http://127.0.0.1:8000`.
@@ -31,4 +28,4 @@ The site will be available at `http://127.0.0.1:8000`.
 
 - `docs_sp/` — Source markdown files
 - `docs_site_sp/` — Build output (gitignored)
-- `mkdocs-sp.yml` — Zensical configuration
+- `zensical.toml` — Zensical configuration
