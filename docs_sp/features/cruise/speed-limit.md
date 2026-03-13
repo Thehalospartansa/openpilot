@@ -22,7 +22,7 @@ Speed Limit Assist pulls speed limit data from **two sources**:
 | Source | Description |
 |--------|-------------|
 | **Car State** | Speed limit information provided by the vehicle's built-in sensors (e.g., Traffic Sign Recognition cameras). Availability depends on the vehicle. |
-| **Map Data** | Speed limits from downloaded OpenStreetMap data. Requires [OSM Maps](osm-maps.md) to be configured and downloaded. |
+| **Map Data** | Speed limits from downloaded OpenStreetMap data. Requires [OSM Maps](../connected/osm-maps.md) to be configured and downloaded. |
 
 ### Speed Limit Policy
 
@@ -73,11 +73,11 @@ Speed Limit Assist provides visual indicators on the driving HUD:
 
 !!! info "Requirements"
     - Longitudinal control must be available, **or** [ICBM](icbm.md) must be enabled
-    - For map-based limits: [OSM Maps](osm-maps.md) must be configured and downloaded
+    - For map-based limits: [OSM Maps](../connected/osm-maps.md) must be configured and downloaded
 
 ## How to Enable
 
-**Settings** → **sunnypilot** → **Cruise Control** → **Speed Limit Assist**
+**Settings** → **Cruise** → **Speed Limit Assist**
 
 ## Vehicle Restrictions
 

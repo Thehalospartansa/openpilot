@@ -75,9 +75,9 @@ Enables a neural network model to handle lateral control instead of the traditio
 
 The Steering section contains these additional configuration pages:
 
-- **[MADS Settings](mads.md)** -- configure engagement modes and brake pedal behavior
-- **[Lane Change Settings](lane-change.md)** -- configure auto lane change timing and blind spot monitoring
-- **[Torque Settings](torque.md)** -- fine-tune torque lateral control parameters
+- **[MADS Settings](mads.md)** - configure engagement modes and brake pedal behavior
+- **[Lane Change Settings](lane-change.md)** - configure auto lane change timing and blind spot monitoring
+- **[Torque Settings](torque.md)** - fine-tune torque lateral control parameters
 
 ---
 

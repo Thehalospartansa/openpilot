@@ -19,11 +19,11 @@ SCC-M uses downloaded OpenStreetMap data to anticipate road changes — curves, 
 !!! info "Requirements"
     - [ICBM](icbm.md) must be enabled
     - Vehicle must support ICBM
-    - [OSM Maps](osm-maps.md) must be configured and downloaded
+    - [OSM Maps](../connected/osm-maps.md) must be configured and downloaded
 
 ## How to Enable
 
-**Settings** → **sunnypilot** → **Cruise Control** → **Smart Cruise Control — Map**
+**Settings** → **Cruise** → **Smart Cruise Control — Map**
 
 ## Settings Reference
 

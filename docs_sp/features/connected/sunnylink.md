@@ -58,10 +58,10 @@ sunnylink maintains a persistent WebSocket connection to the backend, enabling:
 
 ## How to Configure
 
-**Settings** > **sunnypilot** > **sunnylink**
+**Settings** → **sunnylink**
 
 sunnylink requires explicit user consent before activation. On first enable, a consent dialog explains what data is collected and how it is used.
 
 ## Settings Reference
 
-See [sunnylink Settings](../settings/sunnylink.md) for all configuration options.
+See [sunnylink Settings](../../settings/sunnylink.md) for all configuration options.

@@ -27,7 +27,7 @@ How long after the blinker is deactivated before lateral control re-engages. A s
 
 ## How to Configure
 
-**Settings** > **sunnypilot** > **Steering**
+**Settings** → **Steering**
 
 Look for the Blinker Pause Lateral Control toggle and its sub-settings.
 

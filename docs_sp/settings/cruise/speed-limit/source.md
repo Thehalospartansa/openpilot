@@ -32,6 +32,6 @@ A row of five buttons lets you choose the source policy:
 
 ## Related
 
-- [Speed Limit Settings](index.md) -- mode, offset type, and offset value
-- [OSM Panel](../../osm.md) -- download map data for your region
-- [Speed Limit Assist (Feature)](../../../features/cruise/speed-limit.md) -- how Speed Limit Assist works
+- [Speed Limit Settings](index.md) - mode, offset type, and offset value
+- [OSM Panel](../../osm.md) - download map data for your region
+- [Speed Limit Assist (Feature)](../../../features/cruise/speed-limit.md) - how Speed Limit Assist works

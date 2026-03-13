@@ -43,7 +43,7 @@ Because this operates outside the vehicle manufacturer's intended cruise control
 
 ## How to Enable
 
-**Settings** → **sunnypilot** → **Cruise Control** → **Alpha Longitudinal**
+**Settings** → **Developer** → **sunnypilot Longitudinal Control (Alpha)**
 
 !!! note
     This toggle only appears on development branches and only for vehicles where `alphaLongitudinalAvailable` is `True`.

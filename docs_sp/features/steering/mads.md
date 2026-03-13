@@ -48,7 +48,7 @@ This setting controls what happens to steering assistance when the brake pedal i
 
 ## How to Enable
 
-**Settings** → **sunnypilot** → **Steering** → enable **MADS**
+**Settings** → **Steering** → enable **MADS**
 
 Then configure the sub-settings in **MADS Settings**.
 

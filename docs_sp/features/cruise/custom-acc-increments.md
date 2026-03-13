@@ -21,7 +21,7 @@ Customize the speed increments when you press the cruise control buttons. Instea
 
 ## How to Enable
 
-**Settings** → **sunnypilot** → **Cruise Control** → **Custom ACC Increments**
+**Settings** → **Cruise** → **Custom ACC Increments**
 
 ## Settings Reference
 

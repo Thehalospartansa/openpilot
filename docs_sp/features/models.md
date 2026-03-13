@@ -23,8 +23,8 @@ Advanced parameters are only visible when **Show Advanced Controls** is enabled 
 
 ## How to Configure
 
-**Settings** → **sunnypilot** → **Models & AI**
+**Settings** → **Models**
 
 ## Settings Reference
 
-See [Models & AI Settings](../settings/models.md) for all configuration options.
+See [Models Settings](../settings/models.md) for all configuration options.

@@ -38,7 +38,7 @@ When NNLC is enabled, the system matches your vehicle to the best available mode
 
 ## How to Enable
 
-**Settings** → **sunnypilot** → **Steering** → **Neural Network Lateral Control**
+**Settings** → **Steering** → **Neural Network Lateral Control**
 
 !!! tip
     Not all vehicles have NNLC models available. If the toggle does not appear, your vehicle may use angle-based steering which is not compatible with NNLC, or a trained model may not yet exist for your vehicle.

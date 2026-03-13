@@ -27,8 +27,8 @@ Customize the heads-up display (HUD) elements and visual overlays shown on the d
 
 ## How to Configure
 
-**Settings** → **sunnypilot** → **Visuals & HUD**
+**Settings** → **Visuals**
 
 ## Settings Reference
 
-See [Visuals & HUD Settings](../settings/visuals.md) for all toggle options and multi-button selectors.
+See [Visuals Settings](../../settings/visuals.md) for all toggle options and multi-button selectors.

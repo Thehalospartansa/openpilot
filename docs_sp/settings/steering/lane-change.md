@@ -21,7 +21,7 @@ A selector that controls how lane changes are initiated when you activate the tu
 |--------|-------------|
 | **Off** | Auto lane change is disabled |
 | **Nudge** | Requires a light steering nudge in the desired direction to start the lane change (default) |
-| **Nudgeless** | Lane change begins immediately when the turn signal is activated -- no nudge needed |
+| **Nudgeless** | Lane change begins immediately when the turn signal is activated - no nudge needed |
 | **0.5 s** | Lane change begins 0.5 seconds after the turn signal is activated |
 | **1 s** | Lane change begins 1 second after activation |
 | **2 s** | Lane change begins 2 seconds after activation |

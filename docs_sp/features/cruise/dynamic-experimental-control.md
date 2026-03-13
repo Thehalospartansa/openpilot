@@ -54,7 +54,7 @@ Based on these signals, DEC switches between:
 
 ## How to Enable
 
-**Settings** → **sunnypilot** → **Cruise Control** → **Dynamic Experimental Control**
+**Settings** → **Cruise** → **Dynamic Experimental Control**
 
 ## Settings Reference
 

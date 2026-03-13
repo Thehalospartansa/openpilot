@@ -29,7 +29,7 @@ Automatically executes lane changes when you activate the turn signal. You can c
 
 ## How to Enable
 
-**Settings** → **sunnypilot** → **Steering** → **Lane Change Settings**
+**Settings** → **Steering** → **Customize Lane Change**
 
 ## Modes
 

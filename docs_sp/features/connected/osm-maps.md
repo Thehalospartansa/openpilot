@@ -23,7 +23,7 @@ Integrates OpenStreetMap (OSM) data to provide speed limit information, road geo
 
 ## How to Set Up
 
-**Settings** → **sunnypilot** → **OSM Maps**
+**Settings** → **OSM**
 
 1. Select your **Country**
 2. If in the US, select your **State**
@@ -42,4 +42,4 @@ Integrates OpenStreetMap (OSM) data to provide speed limit information, road geo
 
 ## Settings Reference
 
-See [OSM Maps Settings](../settings/osm.md) for all options and status information.
+See [OSM Settings](../../settings/osm.md) for all options and status information.

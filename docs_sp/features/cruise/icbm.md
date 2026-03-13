@@ -61,7 +61,7 @@ ICBM support varies by vehicle brand. The feature toggle only appears in setting
 
 ## How to Enable
 
-**Settings** → **sunnypilot** → **Cruise Control** → **Intelligent Cruise Button Management**
+**Settings** → **Cruise** → **Intelligent Cruise Button Management**
 
 ## Features Unlocked by ICBM
 

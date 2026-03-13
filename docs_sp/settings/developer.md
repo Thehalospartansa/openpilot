@@ -15,7 +15,7 @@ Advanced settings for developers and power users, including debug tools, connect
 
 ## Show Advanced Controls
 
-Reveals additional advanced settings throughout the sunnypilot interface. Enabling this does not change any driving behavior -- it only makes hidden controls visible.
+Reveals additional advanced settings throughout the sunnypilot interface. Enabling this does not change any driving behavior - it only makes hidden controls visible.
 
 Settings gated behind this toggle include:
 

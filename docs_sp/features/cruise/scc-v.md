@@ -21,7 +21,7 @@ The camera continuously monitors the road ahead. When a lead vehicle is detected
 
 ## How to Enable
 
-**Settings** → **sunnypilot** → **Cruise Control** → **Smart Cruise Control — Vision**
+**Settings** → **Cruise** → **Smart Cruise Control — Vision**
 
 ## Settings Reference
 

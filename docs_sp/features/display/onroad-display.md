@@ -16,8 +16,8 @@ Control the screen brightness, timeout behavior, and touch interactivity while d
 
 ## How to Configure
 
-**Settings** → **sunnypilot** → **Display**
+**Settings** → **Display**
 
 ## Settings Reference
 
-See [Display Settings](../settings/display.md) for all configuration options.
+See [Display Settings](../../settings/display.md) for all configuration options.

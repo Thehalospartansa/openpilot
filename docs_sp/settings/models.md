@@ -26,9 +26,9 @@ A button labeled **SELECT** that opens a model selection dialog. The currently a
 
 When a model is being downloaded, progress bars appear for each component:
 
-- **Driving Model** -- the main supercombo neural network
-- **Vision Model** -- the vision processing model
-- **Policy Model** -- the decision-making policy model
+- **Driving Model** - the main supercombo neural network
+- **Vision Model** - the vision processing model
+- **Policy Model** - the decision-making policy model
 
 Each shows a progress bar with download percentage.
 

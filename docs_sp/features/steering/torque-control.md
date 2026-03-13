@@ -26,7 +26,7 @@ Torque-based lateral control applies steering commands as torque (rotational for
 
 ## How to Enable
 
-1. Go to **Settings** → **sunnypilot** → **Steering**
+1. Go to **Settings** → **Steering**
 2. Enable **Enforce Torque Control**
 3. Open the **Torque Settings** sub-panel to fine-tune
 

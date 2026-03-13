@@ -45,7 +45,7 @@ A row of three buttons that controls how the speed offset is calculated:
 
 | Type | What it does |
 |------|-------------|
-| **None** | No offset -- cruise matches the exact speed limit |
+| **None** | No offset - cruise matches the exact speed limit |
 | **Fixed** | A fixed value (in km/h or mph) is added to or subtracted from the limit |
 | **%** | A percentage is applied to the speed limit |
 

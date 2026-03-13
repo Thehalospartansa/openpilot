@@ -14,13 +14,13 @@ The full-featured interface with a sidebar-based settings panel. All settings an
 
 ### comma four (MICI)
 
-A simplified, touch-friendly interface designed for the comma four's compact form factor. Only a subset of settings are exposed through the on-device screen. Most features still work on comma four -- you configure the hidden ones through sunnylink.
+A simplified, touch-friendly interface designed for the comma four's compact form factor. Only a subset of settings are exposed through the on-device screen. Most features still work on comma four - you configure the hidden ones through sunnylink.
 
 However, some onroad visual features require UI rendering code that does not exist on comma four. These features cannot be activated on comma four even through sunnylink. Each setting page notes which category it falls into.
 
 ### sunnylink (Web / App)
 
-The sunnylink web interface provides access to all configurable settings regardless of which device you use. If a setting is not shown on your comma four's screen, you can configure it through sunnylink -- provided the feature is supported on your device.
+The sunnylink web interface provides access to all configurable settings regardless of which device you use. If a setting is not shown on your comma four's screen, you can configure it through sunnylink - provided the feature is supported on your device.
 
 ## Three Levels of Device Availability
 
@@ -71,7 +71,7 @@ The following features from the [Visuals](visuals.md) panel rely on onroad UI re
 
 ## What This Means for You
 
-If you use a **comma four**, your on-device screen shows a simplified set of controls. Most sunnypilot features still run on your device -- you configure the hidden ones through **sunnylink**. The exception is the onroad visual features listed above, which require rendering code that does not exist on comma four.
+If you use a **comma four**, your on-device screen shows a simplified set of controls. Most sunnypilot features still run on your device - you configure the hidden ones through **sunnylink**. The exception is the onroad visual features listed above, which require rendering code that does not exist on comma four.
 
 If you use a **comma 3X or comma 3**, all settings and onroad visual features are directly accessible from the device sidebar.
 
