@@ -31,7 +31,7 @@ jobs:
           DISCOURSE_URL: ${{ secrets.DISCOURSE_URL }}
           DISCOURSE_API_KEY: ${{ secrets.DISCOURSE_API_KEY }}
           DISCOURSE_API_USER: ${{ secrets.DISCOURSE_API_USER }}
-          DISCOURSE_CATEGORY_MAP: '{"getting-started": 115}'
+          DISCOURSE_CATEGORY_MAP: '{"getting-started": 133}'
         run: |
           uv run --python 3.12 python -c "
           import sys
