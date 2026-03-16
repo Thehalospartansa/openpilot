@@ -8,11 +8,13 @@ See the LICENSE.md file in the root directory for more details.
 import pyray as rl
 from dataclasses import dataclass
 from openpilot.common.constants import CV
+from openpilot.common.filter_simple import FirstOrderFilter
 from openpilot.selfdrive.ui.ui_state import ui_state
 from openpilot.system.ui.lib.application import gui_app, FontWeight
 from openpilot.system.ui.lib.multilang import tr
 from openpilot.system.ui.lib.text_measure import measure_text_cached
 from openpilot.system.ui.widgets import Widget
+from openpilot.selfdrive.ui.mici.onroad.alert_renderer import AlertRenderer
 
 METER_TO_KM = 0.001
 METER_TO_MILE = 0.000621371
@@ -56,6 +58,9 @@ class MapdInfoPanel(Widget):
     self._marquee_pause_timer: float = 0.0
     self._marquee_speed: float = 40.0
     self._marquee_pause_duration: float = 1.5
+
+    self._alert_renderer = AlertRenderer()
+    self._alert_alpha_filter = FirstOrderFilter(0, 0.05, 1 / gui_app.target_fps)
 
   def _update_state(self) -> None:
     sm = ui_state.sm
@@ -161,6 +166,15 @@ class MapdInfoPanel(Widget):
     scc_x = left_x + speed_size.x + 14
     scc_y = mid_y - 50
     self._draw_scc_icons(scc_x, scc_y)
+
+    if ui_state.started:
+      alert_obj, no_alert = self._alert_renderer.will_render()
+      self._alert_alpha_filter.update(0 if no_alert else 1)
+      
+      alpha = self._alert_alpha_filter.x
+      if alpha > 0.01:
+        rl.draw_rectangle(int(rect.x), int(rect.y), int(rect.width), int(rect.height), rl.Color(0, 0, 0, int(150 * alpha)))
+      self._alert_renderer.render(rect)
 
   def _draw_scc_icons(self, x: float, y: float) -> None:
     sm = ui_state.sm
