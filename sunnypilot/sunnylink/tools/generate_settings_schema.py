@@ -294,9 +294,28 @@ def _visuals_panel() -> Panel:
   )
 
 
+def _toggles_panel() -> Panel:
+  """Stock openpilot toggles from selfdrive/ui/layouts/settings/toggles.py.
+
+  Items already redistributed to other panels (Device, Cruise):
+    DisengageOnAccelerator, LongitudinalPersonality, RecordFront, RecordAudio, IsMetric
+  """
+  return Panel(
+    id="toggles", label="Toggles", icon="toggles", order=5,
+    items=[
+      SchemaItem(key="OpenpilotEnabledToggle", widget="toggle",
+                 enablement=[offroad_only()]),
+      SchemaItem(key="ExperimentalMode", widget="toggle",
+                 enablement=[cap("has_longitudinal_control", True)]),
+      SchemaItem(key="IsLdwEnabled", widget="toggle"),
+      SchemaItem(key="AlwaysOnDM", widget="toggle"),
+    ],
+  )
+
+
 def _device_panel() -> Panel:
   return Panel(
-    id="device", label="Device", icon="device", order=5,
+    id="device", label="Device", icon="device", order=6,
     items=[
       SchemaItem(key="OffroadMode", widget="toggle"),
       SchemaItem(key="DeviceBootMode", widget="multiple_button"),
@@ -315,7 +334,7 @@ def _device_panel() -> Panel:
 def _software_panel() -> Panel:
   """software.py: DisableUpdates only."""
   return Panel(
-    id="software", label="Software", icon="software", order=6,
+    id="software", label="Software", icon="software", order=7,
     items=[
       SchemaItem(key="DisableUpdates", widget="toggle",
                  enablement=[offroad_only()],
@@ -327,7 +346,7 @@ def _software_panel() -> Panel:
 def _sunnylink_panel() -> Panel:
   """sunnylink.py: SunnylinkEnabled, EnableSunnylinkUploader."""
   return Panel(
-    id="sunnylink", label="sunnylink", icon="sunnylink", order=7,
+    id="sunnylink", label="sunnylink", icon="sunnylink", order=8,
     remote_configurable=False,
     items=[
       SchemaItem(key="SunnylinkEnabled", widget="toggle",
@@ -349,7 +368,7 @@ def _developer_panel() -> Panel:
     ShowAdvancedControls, EnableGithubRunner, EnableCopyparty, QuickBootToggle
   """
   return Panel(
-    id="developer", label="Developer", icon="developer", order=8,
+    id="developer", label="Developer", icon="developer", order=9,
     items=[
       # ── Upstream items ──
       SchemaItem(key="AdbEnabled", widget="toggle",
@@ -393,7 +412,7 @@ def _models_panel() -> Panel:
   Not remote-configurable (dedicated frontend UI for model selection).
   """
   return Panel(
-    id="models", label="Models", icon="models", order=9,
+    id="models", label="Models", icon="models", order=10,
     remote_configurable=False,
     items=[
       SchemaItem(key="LaneTurnDesire", widget="toggle"),
@@ -529,6 +548,7 @@ def generate_schema() -> dict:
     _cruise_panel(),
     _display_panel(),
     _visuals_panel(),
+    _toggles_panel(),
     _device_panel(),
     _software_panel(),
     _sunnylink_panel(),
