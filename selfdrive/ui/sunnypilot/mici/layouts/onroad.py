@@ -15,7 +15,7 @@ class OnroadViewContainerSP(Scroller):
   def __init__(self, bookmark_callback=None):
     super().__init__(horizontal=False, snap_items=True, spacing=0, pad=0, scroll_indicator=False, edge_shadows=False)
     self.road_view = AugmentedRoadView(bookmark_callback=bookmark_callback)
-    self.mapd_panel = MapdInfoPanel()
+    self.mapd_panel = MapdInfoPanel(bookmark_callback=bookmark_callback)
 
     self._scroller.add_widgets([
       self.road_view,

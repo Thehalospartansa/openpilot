@@ -15,6 +15,7 @@ from openpilot.system.ui.lib.multilang import tr
 from openpilot.system.ui.lib.text_measure import measure_text_cached
 from openpilot.system.ui.widgets import Widget
 from openpilot.selfdrive.ui.mici.onroad.alert_renderer import AlertRenderer
+from openpilot.selfdrive.ui.mici.onroad.augmented_road_view import BookmarkIcon
 
 METER_TO_KM = 0.001
 METER_TO_MILE = 0.000621371
@@ -37,7 +38,7 @@ COLORS = MapdPanelColors()
 
 
 class MapdInfoPanel(Widget):
-  def __init__(self):
+  def __init__(self, bookmark_callback=None):
     super().__init__()
     self.speed_limit: float = 0.0
     self.speed_limit_valid: bool = False
@@ -64,6 +65,8 @@ class MapdInfoPanel(Widget):
     self._alert_renderer = AlertRenderer()
     self._alert_alpha_filter = FirstOrderFilter(0, 0.05, 1 / gui_app.target_fps)
 
+    self._bookmark_icon = BookmarkIcon(bookmark_callback)
+
   def _update_state(self) -> None:
     sm = ui_state.sm
     speed_conv = CV.MS_TO_KPH if ui_state.is_metric else CV.MS_TO_MPH
@@ -88,7 +91,6 @@ class MapdInfoPanel(Widget):
       self.cruise_enabled = sm["carState"].cruiseState.enabled
       v_cruise_cluster = sm["carState"].vCruiseCluster
       set_speed_kph = sm["controlsState"].vCruiseDEPRECATED if v_cruise_cluster == 0.0 else v_cruise_cluster
-      
       self.set_speed = set_speed_kph * (METER_TO_MILE / METER_TO_KM) if not ui_state.is_metric else set_speed_kph
 
   def _render(self, rect: rl.Rectangle) -> None:
@@ -158,9 +160,9 @@ class MapdInfoPanel(Widget):
 
     if self.speed_limit_offset != 0 and self.speed_limit_valid:
       offset_val = str(abs(round(self.speed_limit_offset)))
-      badge_sz = 34
+      badge_sz = 42
       badge_x = sign_x + sign_width - badge_sz * 0.85
-      badge_y = sign_y - badge_sz * 0.15
+      badge_y = sign_y - badge_sz * 0.25
 
       if ui_state.is_metric:
         badge_r = badge_sz / 2
@@ -168,20 +170,22 @@ class MapdInfoPanel(Widget):
         badge_cy = badge_y + badge_r
         rl.draw_circle(int(badge_cx), int(badge_cy), badge_r + 2, COLORS.dark_grey)
         rl.draw_circle(int(badge_cx), int(badge_cy), badge_r, rl.Color(60, 60, 60, 255))
-        self._draw_text_centered(self._font_bold, offset_val, 20, rl.Vector2(badge_cx, badge_cy), COLORS.white)
+        self._draw_text_centered(self._font_bold, offset_val, 24, rl.Vector2(badge_cx, badge_cy), COLORS.white)
       else:
         mutcd_badge_x = sign_x + sign_width - badge_sz * 0.65
-        mutcd_badge_y = sign_y - badge_sz * 0.35
+        mutcd_badge_y = sign_y - badge_sz * 0.50
         badge_rect = rl.Rectangle(mutcd_badge_x, mutcd_badge_y, badge_sz, badge_sz)
         rl.draw_rectangle_rounded(badge_rect, 0.25, 10, rl.Color(60, 60, 60, 255))
         rl.draw_rectangle_rounded_lines_ex(badge_rect, 0.25, 10, 2, COLORS.dark_grey)
-        self._draw_text_centered(self._font_bold, offset_val, 20, rl.Vector2(mutcd_badge_x + badge_sz / 2, mutcd_badge_y + badge_sz / 2), COLORS.white)
+        self._draw_text_centered(self._font_bold, offset_val, 24, rl.Vector2(mutcd_badge_x + badge_sz / 2, mutcd_badge_y + badge_sz / 2), COLORS.white)
 
     # SCC
     speed_size = measure_text_cached(self._font_bold, speed_val, 110)
     scc_x = left_x + speed_size.x + 30
     scc_y = mid_y - 50
     self._draw_scc_icons(scc_x, scc_y)
+
+    self._bookmark_icon.render(rect)
 
     if ui_state.started:
       alert_obj, no_alert = self._alert_renderer.will_render()
@@ -278,15 +282,15 @@ class MapdInfoPanel(Widget):
     rl.draw_rectangle_rounded_lines_ex(inner_rect, inner_roundness, 10, 3, COLORS.black)
 
     mid_x = x + width / 2
-    label_size = max(16, int(width * 0.22))
+    label_size = max(18, int(width * 0.26))
     if is_upcoming:
       self._draw_text_centered(self._font_bold, tr("AHEAD"), label_size, rl.Vector2(mid_x, y + height * 0.27), COLORS.black)
     else:
-      self._draw_text_centered(self._font_bold, tr("SPEED"), label_size, rl.Vector2(mid_x, y + height * 0.18), COLORS.black)
-      self._draw_text_centered(self._font_bold, tr("LIMIT"), label_size, rl.Vector2(mid_x, y + height * 0.36), COLORS.black)
+      self._draw_text_centered(self._font_bold, tr("SPEED"), label_size, rl.Vector2(mid_x, y + height * 0.20), COLORS.black)
+      self._draw_text_centered(self._font_bold, tr("LIMIT"), label_size, rl.Vector2(mid_x, y + height * 0.40), COLORS.black)
 
-    speed_font_size = int(width * 0.42) if len(speed_str) >= 3 else int(width * 0.50)
-    self._draw_text_centered(self._font_bold, speed_str, speed_font_size, rl.Vector2(mid_x, y + height * 0.66), speed_color)
+    speed_font_size = int(width * 0.52) if len(speed_str) >= 3 else int(width * 0.62)
+    self._draw_text_centered(self._font_bold, speed_str, speed_font_size, rl.Vector2(mid_x, y + height * 0.72), speed_color)
 
   def _draw_text_centered(self, font, text, size, pos_center, color):
     sz = measure_text_cached(font, text, size)
