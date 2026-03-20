@@ -1,0 +1,1189 @@
+{
+  "$schema": "./settings_ui.schema.json",
+  "schema_version": "1.0",
+  "panels": [
+    {
+      "id": "steering",
+      "label": "Steering",
+      "icon": "steering_wheel",
+      "order": 1,
+      "remote_configurable": true,
+      "description": "Lateral control, lane changes, and steering behavior",
+      "sections": [
+        {
+          "id": "mads",
+          "title": "MADS",
+          "description": "Modified Assistive Driving Safety",
+          "items": [
+            {
+              "key": "Mads",
+              "widget": "toggle",
+              "enablement": [
+                {
+                  "type": "offroad_only"
+                }
+              ]
+            }
+          ],
+          "sub_panels": [
+            {
+              "id": "mads_settings",
+              "label": "MADS Settings",
+              "trigger_key": "Mads",
+              "trigger_condition": {
+                "type": "param",
+                "key": "Mads",
+                "equals": true
+              },
+              "items": [
+                {
+                  "key": "MadsMainCruiseAllowed",
+                  "widget": "toggle",
+                  "enablement": [
+                    {
+                      "type": "offroad_only"
+                    }
+                  ]
+                },
+                {
+                  "key": "MadsUnifiedEngagementMode",
+                  "widget": "toggle",
+                  "enablement": [
+                    {
+                      "type": "offroad_only"
+                    }
+                  ]
+                },
+                {
+                  "key": "MadsSteeringMode",
+                  "widget": "multiple_button",
+                  "enablement": [
+                    {
+                      "type": "offroad_only"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blinker",
+          "title": "Blinker Control",
+          "description": "Lateral pause behavior during turn signals",
+          "items": [
+            {
+              "key": "BlinkerPauseLateralControl",
+              "widget": "toggle",
+              "sub_items": [
+                {
+                  "key": "BlinkerMinLateralControlSpeed",
+                  "widget": "option",
+                  "visibility": [
+                    {
+                      "type": "param",
+                      "key": "BlinkerPauseLateralControl",
+                      "equals": true
+                    }
+                  ]
+                },
+                {
+                  "key": "BlinkerLateralReengageDelay",
+                  "widget": "option",
+                  "visibility": [
+                    {
+                      "type": "param",
+                      "key": "BlinkerPauseLateralControl",
+                      "equals": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "torque",
+          "title": "Torque Control",
+          "description": "Steering torque tuning and lateral control method",
+          "items": [
+            {
+              "key": "EnforceTorqueControl",
+              "widget": "toggle",
+              "visibility": [
+                {
+                  "type": "not",
+                  "condition": {
+                    "type": "capability",
+                    "field": "steer_control_type",
+                    "equals": "angle"
+                  }
+                }
+              ],
+              "enablement": [
+                {
+                  "type": "offroad_only"
+                },
+                {
+                  "type": "capability",
+                  "field": "torque_allowed",
+                  "equals": true
+                },
+                {
+                  "type": "param",
+                  "key": "NeuralNetworkLateralControl",
+                  "equals": false
+                }
+              ]
+            },
+            {
+              "key": "NeuralNetworkLateralControl",
+              "widget": "toggle",
+              "visibility": [
+                {
+                  "type": "not",
+                  "condition": {
+                    "type": "capability",
+                    "field": "steer_control_type",
+                    "equals": "angle"
+                  }
+                }
+              ],
+              "enablement": [
+                {
+                  "type": "offroad_only"
+                },
+                {
+                  "type": "capability",
+                  "field": "torque_allowed",
+                  "equals": true
+                },
+                {
+                  "type": "param",
+                  "key": "EnforceTorqueControl",
+                  "equals": false
+                }
+              ]
+            }
+          ],
+          "sub_panels": [
+            {
+              "id": "torque_settings",
+              "label": "Torque Settings",
+              "trigger_key": "EnforceTorqueControl",
+              "trigger_condition": {
+                "type": "param",
+                "key": "EnforceTorqueControl",
+                "equals": true
+              },
+              "items": [
+                {
+                  "key": "LiveTorqueParamsToggle",
+                  "widget": "toggle",
+                  "enablement": [
+                    {
+                      "type": "offroad_only"
+                    }
+                  ]
+                },
+                {
+                  "key": "LiveTorqueParamsRelaxedToggle",
+                  "widget": "toggle",
+                  "visibility": [
+                    {
+                      "type": "param",
+                      "key": "LiveTorqueParamsToggle",
+                      "equals": true
+                    }
+                  ],
+                  "enablement": [
+                    {
+                      "type": "offroad_only"
+                    }
+                  ]
+                },
+                {
+                  "key": "CustomTorqueParams",
+                  "widget": "toggle",
+                  "enablement": [
+                    {
+                      "type": "offroad_only"
+                    }
+                  ]
+                },
+                {
+                  "key": "TorqueParamsOverrideEnabled",
+                  "widget": "toggle",
+                  "visibility": [
+                    {
+                      "type": "param",
+                      "key": "CustomTorqueParams",
+                      "equals": true
+                    }
+                  ],
+                  "enablement": [
+                    {
+                      "type": "offroad_only"
+                    }
+                  ]
+                },
+                {
+                  "key": "TorqueParamsOverrideLatAccelFactor",
+                  "widget": "option",
+                  "visibility": [
+                    {
+                      "type": "param",
+                      "key": "CustomTorqueParams",
+                      "equals": true
+                    }
+                  ]
+                },
+                {
+                  "key": "TorqueParamsOverrideFriction",
+                  "widget": "option",
+                  "visibility": [
+                    {
+                      "type": "param",
+                      "key": "CustomTorqueParams",
+                      "equals": true
+                    }
+                  ]
+                },
+                {
+                  "key": "TorqueControlTune",
+                  "widget": "multiple_button",
+                  "enablement": [
+                    {
+                      "type": "offroad_only"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "lane_change",
+          "title": "Lane Change",
+          "description": "Automatic lane change timing and behavior",
+          "items": [],
+          "sub_panels": [
+            {
+              "id": "lane_change_settings",
+              "label": "Lane Change Settings",
+              "trigger_key": "AutoLaneChangeTimer",
+              "items": [
+                {
+                  "key": "AutoLaneChangeTimer",
+                  "widget": "multiple_button"
+                },
+                {
+                  "key": "AutoLaneChangeBsmDelay",
+                  "widget": "toggle",
+                  "enablement": [
+                    {
+                      "type": "capability",
+                      "field": "enable_bsm",
+                      "equals": true
+                    },
+                    {
+                      "type": "param_compare",
+                      "key": "AutoLaneChangeTimer",
+                      "op": ">",
+                      "value": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cruise",
+      "label": "Cruise",
+      "icon": "cruise_control",
+      "order": 2,
+      "remote_configurable": true,
+      "description": "Longitudinal control, speed limits, and cruise behavior",
+      "sections": [
+        {
+          "id": "driving_personality",
+          "title": "Driving Personality",
+          "description": "Adjust how aggressively the car follows traffic",
+          "items": [
+            {
+              "key": "LongitudinalPersonality",
+              "widget": "multiple_button"
+            }
+          ]
+        },
+        {
+          "id": "cruise_controls",
+          "title": "Cruise Controls",
+          "description": "Button management and acceleration increments",
+          "items": [
+            {
+              "key": "IntelligentCruiseButtonManagement",
+              "widget": "toggle",
+              "visibility": [
+                {
+                  "type": "capability",
+                  "field": "icbm_available",
+                  "equals": true
+                }
+              ],
+              "enablement": [
+                {
+                  "type": "offroad_only"
+                }
+              ]
+            },
+            {
+              "key": "CustomAccIncrementsEnabled",
+              "widget": "toggle",
+              "enablement": [
+                {
+                  "type": "offroad_only"
+                },
+                {
+                  "type": "any",
+                  "conditions": [
+                    {
+                      "type": "capability",
+                      "field": "has_longitudinal_control",
+                      "equals": true
+                    },
+                    {
+                      "type": "capability",
+                      "field": "has_icbm",
+                      "equals": true
+                    }
+                  ]
+                }
+              ],
+              "sub_items": [
+                {
+                  "key": "CustomAccShortPressIncrement",
+                  "widget": "option",
+                  "visibility": [
+                    {
+                      "type": "param",
+                      "key": "CustomAccIncrementsEnabled",
+                      "equals": true
+                    }
+                  ]
+                },
+                {
+                  "key": "CustomAccLongPressIncrement",
+                  "widget": "option",
+                  "visibility": [
+                    {
+                      "type": "param",
+                      "key": "CustomAccIncrementsEnabled",
+                      "equals": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "speed_limits",
+          "title": "Speed Limits",
+          "description": "Speed limit detection and offset behavior",
+          "items": [],
+          "sub_panels": [
+            {
+              "id": "speed_limit_settings",
+              "label": "Speed Limit Settings",
+              "trigger_key": "SpeedLimitMode",
+              "items": [
+                {
+                  "key": "SpeedLimitMode",
+                  "widget": "multiple_button"
+                },
+                {
+                  "key": "SpeedLimitPolicy",
+                  "widget": "multiple_button",
+                  "visibility": [
+                    {
+                      "type": "param_compare",
+                      "key": "SpeedLimitMode",
+                      "op": ">",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "key": "SpeedLimitOffsetType",
+                  "widget": "multiple_button",
+                  "visibility": [
+                    {
+                      "type": "param_compare",
+                      "key": "SpeedLimitMode",
+                      "op": ">",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "key": "SpeedLimitValueOffset",
+                  "widget": "option",
+                  "visibility": [
+                    {
+                      "type": "all",
+                      "conditions": [
+                        {
+                          "type": "param_compare",
+                          "key": "SpeedLimitMode",
+                          "op": ">",
+                          "value": 0
+                        },
+                        {
+                          "type": "param_compare",
+                          "key": "SpeedLimitOffsetType",
+                          "op": ">",
+                          "value": 0
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "smart_cruise",
+          "title": "Smart Cruise",
+          "description": "Dynamic and vision-based cruise enhancements",
+          "items": [
+            {
+              "key": "DynamicExperimentalControl",
+              "widget": "toggle",
+              "visibility": [
+                {
+                  "type": "any",
+                  "conditions": [
+                    {
+                      "type": "capability",
+                      "field": "has_longitudinal_control",
+                      "equals": true
+                    },
+                    {
+                      "type": "capability",
+                      "field": "has_icbm",
+                      "equals": true
+                    }
+                  ]
+                }
+              ],
+              "enablement": [
+                {
+                  "type": "capability",
+                  "field": "has_longitudinal_control",
+                  "equals": true
+                }
+              ]
+            },
+            {
+              "key": "SmartCruiseControlVision",
+              "widget": "toggle",
+              "visibility": [
+                {
+                  "type": "any",
+                  "conditions": [
+                    {
+                      "type": "capability",
+                      "field": "has_longitudinal_control",
+                      "equals": true
+                    },
+                    {
+                      "type": "capability",
+                      "field": "has_icbm",
+                      "equals": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "key": "SmartCruiseControlMap",
+              "widget": "toggle",
+              "visibility": [
+                {
+                  "type": "any",
+                  "conditions": [
+                    {
+                      "type": "capability",
+                      "field": "has_longitudinal_control",
+                      "equals": true
+                    },
+                    {
+                      "type": "capability",
+                      "field": "has_icbm",
+                      "equals": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "display",
+      "label": "Display",
+      "icon": "display",
+      "order": 3,
+      "remote_configurable": true,
+      "items": [
+        {
+          "key": "OnroadScreenOffBrightness",
+          "widget": "multiple_button"
+        },
+        {
+          "key": "OnroadScreenOffTimer",
+          "widget": "multiple_button",
+          "enablement": [
+            {
+              "type": "not",
+              "condition": {
+                "type": "any",
+                "conditions": [
+                  {
+                    "type": "param",
+                    "key": "OnroadScreenOffBrightness",
+                    "equals": 0
+                  },
+                  {
+                    "type": "param",
+                    "key": "OnroadScreenOffBrightness",
+                    "equals": 1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "key": "Brightness",
+          "widget": "option"
+        },
+        {
+          "key": "InteractivityTimeout",
+          "widget": "multiple_button"
+        }
+      ]
+    },
+    {
+      "id": "visuals",
+      "label": "Visuals",
+      "icon": "visuals",
+      "order": 4,
+      "remote_configurable": true,
+      "description": "HUD overlays, alerts, and on-screen display elements",
+      "sections": [
+        {
+          "id": "hud_elements",
+          "title": "HUD Elements",
+          "description": "Overlays shown on the driving screen",
+          "items": [
+            {
+              "key": "BlindSpot",
+              "widget": "toggle"
+            },
+            {
+              "key": "TorqueBar",
+              "widget": "toggle"
+            },
+            {
+              "key": "ShowTurnSignals",
+              "widget": "toggle"
+            },
+            {
+              "key": "RoadNameToggle",
+              "widget": "toggle"
+            },
+            {
+              "key": "StandstillTimer",
+              "widget": "toggle"
+            },
+            {
+              "key": "RocketFuel",
+              "widget": "toggle"
+            },
+            {
+              "key": "ChevronInfo",
+              "widget": "multiple_button",
+              "enablement": [
+                {
+                  "type": "capability",
+                  "field": "has_longitudinal_control",
+                  "equals": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "developer_ui",
+          "title": "Developer UI Info",
+          "description": "Speedometer and debug display options",
+          "items": [
+            {
+              "key": "DevUIInfo",
+              "widget": "multiple_button"
+            },
+            {
+              "key": "TrueVEgoUI",
+              "widget": "toggle"
+            },
+            {
+              "key": "HideVEgoUI",
+              "widget": "toggle"
+            }
+          ]
+        },
+        {
+          "id": "alerts_extras",
+          "title": "Alerts & Extras",
+          "description": "Traffic light alerts and visual flair",
+          "items": [
+            {
+              "key": "GreenLightAlert",
+              "widget": "toggle"
+            },
+            {
+              "key": "LeadDepartAlert",
+              "widget": "toggle"
+            },
+            {
+              "key": "RainbowMode",
+              "widget": "toggle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "toggles",
+      "label": "Toggles",
+      "icon": "toggles",
+      "order": 5,
+      "remote_configurable": true,
+      "items": [
+        {
+          "key": "OpenpilotEnabledToggle",
+          "widget": "toggle",
+          "enablement": [
+            {
+              "type": "offroad_only"
+            }
+          ]
+        },
+        {
+          "key": "ExperimentalMode",
+          "widget": "toggle",
+          "enablement": [
+            {
+              "type": "capability",
+              "field": "has_longitudinal_control",
+              "equals": true
+            }
+          ]
+        },
+        {
+          "key": "IsLdwEnabled",
+          "widget": "toggle"
+        },
+        {
+          "key": "AlwaysOnDM",
+          "widget": "toggle"
+        }
+      ]
+    },
+    {
+      "id": "device",
+      "label": "Device",
+      "icon": "device",
+      "order": 6,
+      "remote_configurable": true,
+      "description": "Device behavior, units, and recording settings",
+      "sections": [
+        {
+          "id": "general",
+          "title": "General",
+          "description": "Power, boot, and unit preferences",
+          "items": [
+            {
+              "key": "OffroadMode",
+              "widget": "toggle"
+            },
+            {
+              "key": "DeviceBootMode",
+              "widget": "multiple_button"
+            },
+            {
+              "key": "IsMetric",
+              "widget": "toggle"
+            },
+            {
+              "key": "QuietMode",
+              "widget": "toggle"
+            },
+            {
+              "key": "OnroadUploads",
+              "widget": "toggle"
+            }
+          ]
+        },
+        {
+          "id": "language",
+          "title": "Language",
+          "items": [
+            {
+              "key": "LanguageSetting",
+              "widget": "info"
+            }
+          ]
+        },
+        {
+          "id": "recording",
+          "title": "Recording",
+          "description": "Camera and audio recording during drives",
+          "items": [
+            {
+              "key": "RecordFront",
+              "widget": "toggle"
+            },
+            {
+              "key": "RecordAudio",
+              "widget": "toggle"
+            }
+          ]
+        },
+        {
+          "id": "safety",
+          "title": "Safety & Timeouts",
+          "items": [
+            {
+              "key": "MaxTimeOffroad",
+              "widget": "option"
+            },
+            {
+              "key": "DisengageOnAccelerator",
+              "widget": "toggle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "software",
+      "label": "Software",
+      "icon": "software",
+      "order": 7,
+      "remote_configurable": true,
+      "items": [
+        {
+          "key": "DisableUpdates",
+          "widget": "toggle",
+          "visibility": [
+            {
+              "type": "param",
+              "key": "ShowAdvancedControls",
+              "equals": true
+            }
+          ],
+          "enablement": [
+            {
+              "type": "offroad_only"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sunnylink",
+      "label": "sunnylink",
+      "icon": "sunnylink",
+      "order": 8,
+      "remote_configurable": false,
+      "items": [
+        {
+          "key": "SunnylinkEnabled",
+          "widget": "toggle",
+          "enablement": [
+            {
+              "type": "offroad_only"
+            }
+          ]
+        },
+        {
+          "key": "EnableSunnylinkUploader",
+          "widget": "toggle",
+          "enablement": [
+            {
+              "type": "param",
+              "key": "SunnylinkEnabled",
+              "equals": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "developer",
+      "label": "Developer",
+      "icon": "developer",
+      "order": 9,
+      "remote_configurable": true,
+      "description": "Debug tools, remote access, and advanced services",
+      "sections": [
+        {
+          "id": "connectivity",
+          "title": "Connectivity",
+          "description": "Remote access and debugging interfaces",
+          "items": [
+            {
+              "key": "AdbEnabled",
+              "widget": "toggle",
+              "enablement": [
+                {
+                  "type": "offroad_only"
+                }
+              ]
+            },
+            {
+              "key": "SshEnabled",
+              "widget": "toggle"
+            },
+            {
+              "key": "JoystickDebugMode",
+              "widget": "toggle",
+              "visibility": [
+                {
+                  "type": "not",
+                  "condition": {
+                    "type": "capability",
+                    "field": "is_release",
+                    "equals": true
+                  }
+                }
+              ],
+              "enablement": [
+                {
+                  "type": "offroad_only"
+                }
+              ]
+            },
+            {
+              "key": "LongitudinalManeuverMode",
+              "widget": "toggle",
+              "visibility": [
+                {
+                  "type": "not",
+                  "condition": {
+                    "type": "capability",
+                    "field": "is_release",
+                    "equals": true
+                  }
+                }
+              ],
+              "enablement": [
+                {
+                  "type": "offroad_only"
+                },
+                {
+                  "type": "capability",
+                  "field": "has_longitudinal_control",
+                  "equals": true
+                }
+              ]
+            },
+            {
+              "key": "AlphaLongitudinalEnabled",
+              "widget": "toggle",
+              "visibility": [
+                {
+                  "type": "all",
+                  "conditions": [
+                    {
+                      "type": "capability",
+                      "field": "alpha_long_available",
+                      "equals": true
+                    },
+                    {
+                      "type": "not",
+                      "condition": {
+                        "type": "capability",
+                        "field": "is_release",
+                        "equals": true
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "key": "ShowDebugInfo",
+              "widget": "toggle"
+            }
+          ]
+        },
+        {
+          "id": "advanced_services",
+          "title": "Advanced Services",
+          "description": "Additional services and boot options",
+          "items": [
+            {
+              "key": "ShowAdvancedControls",
+              "widget": "toggle"
+            },
+            {
+              "key": "EnableGithubRunner",
+              "widget": "toggle",
+              "visibility": [
+                {
+                  "type": "all",
+                  "conditions": [
+                    {
+                      "type": "param",
+                      "key": "ShowAdvancedControls",
+                      "equals": true
+                    },
+                    {
+                      "type": "not",
+                      "condition": {
+                        "type": "capability",
+                        "field": "is_release",
+                        "equals": true
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "key": "EnableCopyparty",
+              "widget": "toggle",
+              "visibility": [
+                {
+                  "type": "param",
+                  "key": "ShowAdvancedControls",
+                  "equals": true
+                }
+              ]
+            },
+            {
+              "key": "QuickBootToggle",
+              "widget": "toggle",
+              "visibility": [
+                {
+                  "type": "all",
+                  "conditions": [
+                    {
+                      "type": "param",
+                      "key": "ShowAdvancedControls",
+                      "equals": true
+                    },
+                    {
+                      "type": "not",
+                      "condition": {
+                        "type": "capability",
+                        "field": "is_release",
+                        "equals": true
+                      }
+                    },
+                    {
+                      "type": "not",
+                      "condition": {
+                        "type": "capability",
+                        "field": "is_development",
+                        "equals": true
+                      }
+                    }
+                  ]
+                }
+              ],
+              "enablement": [
+                {
+                  "type": "param",
+                  "key": "DisableUpdates",
+                  "equals": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "models",
+      "label": "Models",
+      "icon": "models",
+      "order": 10,
+      "remote_configurable": false,
+      "items": [
+        {
+          "key": "LaneTurnDesire",
+          "widget": "toggle"
+        },
+        {
+          "key": "LaneTurnValue",
+          "widget": "option",
+          "visibility": [
+            {
+              "type": "all",
+              "conditions": [
+                {
+                  "type": "param",
+                  "key": "LaneTurnDesire",
+                  "equals": true
+                },
+                {
+                  "type": "param",
+                  "key": "ShowAdvancedControls",
+                  "equals": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "LagdToggle",
+          "widget": "toggle"
+        },
+        {
+          "key": "LagdToggleDelay",
+          "widget": "option",
+          "visibility": [
+            {
+              "type": "all",
+              "conditions": [
+                {
+                  "type": "not",
+                  "condition": {
+                    "type": "param",
+                    "key": "LagdToggle",
+                    "equals": true
+                  }
+                },
+                {
+                  "type": "param",
+                  "key": "ShowAdvancedControls",
+                  "equals": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "CameraOffset",
+          "widget": "option"
+        }
+      ]
+    }
+  ],
+  "vehicle_settings": {
+    "hyundai": [
+      {
+        "key": "HyundaiLongitudinalTuning",
+        "widget": "multiple_button",
+        "visibility": [
+          {
+            "type": "capability",
+            "field": "alpha_long_available",
+            "equals": true
+          }
+        ],
+        "enablement": [
+          {
+            "type": "offroad_only"
+          },
+          {
+            "type": "capability",
+            "field": "has_longitudinal_control",
+            "equals": true
+          }
+        ]
+      }
+    ],
+    "toyota": [
+      {
+        "key": "ToyotaEnforceStockLongitudinal",
+        "widget": "toggle",
+        "enablement": [
+          {
+            "type": "offroad_only"
+          }
+        ]
+      },
+      {
+        "key": "ToyotaStopAndGoHack",
+        "widget": "toggle",
+        "enablement": [
+          {
+            "type": "offroad_only"
+          },
+          {
+            "type": "capability",
+            "field": "has_longitudinal_control",
+            "equals": true
+          },
+          {
+            "type": "param",
+            "key": "ToyotaEnforceStockLongitudinal",
+            "equals": false
+          }
+        ]
+      }
+    ],
+    "tesla": [
+      {
+        "key": "TeslaCoopSteering",
+        "widget": "toggle",
+        "enablement": [
+          {
+            "type": "offroad_only"
+          }
+        ]
+      }
+    ],
+    "subaru": [
+      {
+        "key": "SubaruStopAndGo",
+        "widget": "toggle",
+        "enablement": [
+          {
+            "type": "offroad_only"
+          },
+          {
+            "type": "capability",
+            "field": "has_stop_and_go",
+            "equals": true
+          }
+        ]
+      },
+      {
+        "key": "SubaruStopAndGoManualParkingBrake",
+        "widget": "toggle",
+        "enablement": [
+          {
+            "type": "offroad_only"
+          },
+          {
+            "type": "capability",
+            "field": "has_stop_and_go",
+            "equals": true
+          }
+        ]
+      }
+    ]
+  }
+}
