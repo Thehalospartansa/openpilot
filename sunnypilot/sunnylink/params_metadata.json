@@ -5,15 +5,15 @@
   },
   "AdbEnabled": {
     "title": "Enable ADB",
-    "description": ""
+    "description": "ADB (Android Debug Bridge) allows connecting to your device over USB or over the network. See https://docs.comma.ai/how-to/connect-to-comma for more info."
   },
   "AlphaLongitudinalEnabled": {
-    "title": "Alpha Longitudinal",
-    "description": ""
+    "title": "sunnypilot Longitudinal Control (Alpha)",
+    "description": "WARNING: sunnypilot longitudinal control is in alpha for this car and will disable Automatic Emergency Braking (AEB). On this car, sunnypilot defaults to the car's built-in ACC instead of sunnypilot's longitudinal control. Enable this to switch to sunnypilot longitudinal control. Enabling Experimental mode is recommended when enabling sunnypilot longitudinal control alpha. Changing this setting will restart sunnypilot if the car is powered on."
   },
   "AlwaysOnDM": {
-    "title": "Always-on Driver Monitor",
-    "description": ""
+    "title": "Always-On Driver Monitoring",
+    "description": "Enable driver monitoring even when sunnypilot is not engaged."
   },
   "ApiCache_Device": {
     "title": "Api Cache  Device",
@@ -44,12 +44,12 @@
     "description": ""
   },
   "AutoLaneChangeBsmDelay": {
-    "title": "Auto Lane Change BSM Delay",
-    "description": ""
+    "title": "Auto Lane Change: Delay with Blind Spot",
+    "description": "Toggle to enable a delay timer for seamless lane changes when blind spot monitoring (BSM) detects an obstructing vehicle, ensuring safe maneuvering."
   },
   "AutoLaneChangeTimer": {
-    "title": "Auto Lane Change Timer",
-    "description": "",
+    "title": "Auto Lane Change by Blinker",
+    "description": "Set a timer to delay the auto lane change operation when the blinker is used. No nudge on the steering wheel is required to auto lane change if a timer is set. Default is Nudge. Please use caution when using this feature. Only use the blinker when traffic and road conditions permit.",
     "options": [
       {
         "value": -1,
@@ -90,20 +90,28 @@
     "description": ""
   },
   "BlindSpot": {
-    "title": "[TIZI/TICI only] Blind Spot Detection",
+    "title": "Show Blind Spot Warnings",
     "description": "Enabling this will display warnings when a vehicle is detected in your blind spot as long as your car has BSM supported."
   },
   "BlinkerLateralReengageDelay": {
     "title": "Post-Blinker Delay",
-    "description": "Delay before lateral control resumes after the turn signal ends."
+    "description": "Delay before lateral control resumes after the turn signal ends.",
+    "min": 0,
+    "max": 10,
+    "step": 1,
+    "unit": "s"
   },
   "BlinkerMinLateralControlSpeed": {
-    "title": "Blinker Min Lateral Control Speed",
-    "description": ""
+    "title": "Minimum Speed to Pause Lateral Control",
+    "description": "",
+    "min": 0,
+    "max": 255,
+    "step": 5,
+    "unit": "km/h"
   },
   "BlinkerPauseLateralControl": {
-    "title": "Blinker Pause Lateral Control",
-    "description": ""
+    "title": "Pause Lateral Control with Blinker",
+    "description": "Pause lateral control with blinker when traveling below the desired speed selected."
   },
   "BootCount": {
     "title": "Boot Count",
@@ -175,7 +183,7 @@
     "description": ""
   },
   "ChevronInfo": {
-    "title": "Chevron Info",
+    "title": "Display Metrics Below Chevron",
     "description": ""
   },
   "CompletedSunnylinkConsentVersion": {
@@ -199,34 +207,34 @@
     "description": ""
   },
   "CustomAccIncrementsEnabled": {
-    "title": "Custom ACC Increments",
+    "title": "Custom ACC Speed Increments",
     "description": ""
   },
   "CustomAccLongPressIncrement": {
-    "title": "Custom ACC Long Press Increment",
+    "title": "Long Press Increment",
     "description": "",
     "min": 1,
     "max": 10,
     "step": 1
   },
   "CustomAccShortPressIncrement": {
-    "title": "Custom ACC Short Press Increment",
+    "title": "Short Press Increment",
     "description": "",
     "min": 1,
     "max": 10,
     "step": 1
   },
   "CustomTorqueParams": {
-    "title": "Enable Custom Torque Tuning",
-    "description": "Enables custom tuning for Torque lateral control"
+    "title": "Enable Custom Tuning",
+    "description": "Enables custom tuning for Torque lateral control. Modifying Lateral Acceleration Factor and Friction below will override the offline values indicated in the YAML files within \"opendbc/car/torque_data\". The values will also be used live when \"Manual Real-Time Tuning\" toggle is enabled."
   },
   "DevUIInfo": {
-    "title": "Developer UI Info",
-    "description": ""
+    "title": "Developer UI",
+    "description": "Display real-time parameters and metrics from various sources."
   },
   "DeviceBootMode": {
-    "title": "Device Boot Mode",
-    "description": "",
+    "title": "Wake Up Behavior",
+    "description": "Controls state of the device after boot/sleep. Default: Device will boot/wake-up normally and will be ready to engage. Offroad: Device will be in Always Offroad mode after boot/wake-up.",
     "options": [
       {
         "value": 0,
@@ -248,11 +256,11 @@
   },
   "DisableUpdates": {
     "title": "Disable Updates",
-    "description": ""
+    "description": "When enabled, automatic software updates will be off. This requires a reboot to take effect."
   },
   "DisengageOnAccelerator": {
-    "title": "Disengage On Accelerator",
-    "description": ""
+    "title": "Disengage on Accelerator Pedal",
+    "description": "When enabled, pressing the accelerator pedal will disengage sunnypilot."
   },
   "DoReboot": {
     "title": "Reboot",
@@ -275,23 +283,23 @@
     "description": ""
   },
   "DynamicExperimentalControl": {
-    "title": "Dynamic Experimental Control",
-    "description": ""
+    "title": "Enable Dynamic Experimental Control",
+    "description": "Enable toggle to allow the model to determine when to use sunnypilot ACC or sunnypilot End to End Longitudinal."
   },
   "EnableCopyparty": {
     "title": "copyparty Service",
-    "description": ""
+    "description": "copyparty is a very capable file server, you can use it to download your routes, view your logs and even make some edits on some files from your browser. Requires you to connect to your comma locally via its IP address."
   },
   "EnableGithubRunner": {
     "title": "GitHub Runner Service",
-    "description": ""
+    "description": "Enables or disables the GitHub runner service."
   },
   "EnableSunnylinkUploader": {
-    "title": "Enable sunnylink Uploader",
-    "description": ""
+    "title": "Enable sunnylink uploader (infrastructure test)",
+    "description": "Enable sunnylink uploader to allow sunnypilot to upload your driving data to sunnypilot servers. Only for highest tiers, and does NOT bring ANY benefit to you yet. We are just testing data volume."
   },
   "EnforceTorqueControl": {
-    "title": "Enforce Torque Control",
+    "title": "Enforce Torque Lateral Control",
     "description": "Enable this to enforce sunnypilot to steer with Torque lateral control."
   },
   "ExperimentalMode": {
@@ -344,7 +352,7 @@
   },
   "GreenLightAlert": {
     "title": "Green Traffic Light Alert (Beta)",
-    "description": "A chime and on-screen alert (TIZI/TICI only) will play when the traffic light you are waiting for turns green and you have no vehicle in front of you. <br>Note: This chime is only designed as a notification. It is the driver's responsibility to observe their environment and make decisions accordingly."
+    "description": "A chime and on-screen alert will play when the traffic light you are waiting for turns green and you have no vehicle in front of you. Note: This chime is only designed as a notification. It is the driver's responsibility to observe their environment and make decisions accordingly."
   },
   "GsmApn": {
     "title": "GSM APN",
@@ -371,11 +379,11 @@
     "description": ""
   },
   "HideVEgoUI": {
-    "title": "[TIZI/TICI only] Speedometer: Hide from Onroad Screen",
+    "title": "Speedometer: Hide from Onroad Screen",
     "description": "When enabled, the speedometer on the onroad screen is not displayed."
   },
   "HyundaiLongitudinalTuning": {
-    "title": "Hyundai Longitudinal Tuning",
+    "title": "Custom Longitudinal Tuning",
     "description": "",
     "options": [
       {
@@ -397,7 +405,7 @@
     "description": ""
   },
   "IntelligentCruiseButtonManagement": {
-    "title": "Intelligent Cruise Button Management",
+    "title": "Intelligent Cruise Button Management (ICBM) (Alpha)",
     "description": ""
   },
   "InteractivityTimeout": {
@@ -471,12 +479,12 @@
     "description": ""
   },
   "IsLdwEnabled": {
-    "title": "Lane Departure Warnings",
-    "description": ""
+    "title": "Enable Lane Departure Warnings",
+    "description": "Receive alerts to steer back into the lane when your vehicle drifts over a detected lane line without a turn signal activated while driving over 31 mph (50 km/h)."
   },
   "IsMetric": {
-    "title": "Use Metric Units",
-    "description": ""
+    "title": "Use Metric System",
+    "description": "Display speed in km/h instead of mph."
   },
   "IsOffroad": {
     "title": "Is Offroad",
@@ -515,8 +523,8 @@
     "description": "Allow device to learn and adapt car's steering response time"
   },
   "LagdToggleDelay": {
-    "title": "Manual Software Delay",
-    "description": "Software delay to use when Live Learning Steer Delay is toggled off",
+    "title": "Adjust Software Delay",
+    "description": "Adjust the software delay when Live Learning Steer Delay is toggled off. The default software delay value is 0.2",
     "min": 0.05,
     "max": 0.5,
     "step": 0.01
@@ -526,12 +534,12 @@
     "description": ""
   },
   "LaneTurnDesire": {
-    "title": "Lane Turn Desire",
-    "description": "Force model to plan an intent to turn based on blinker"
+    "title": "Use Lane Turn Desires",
+    "description": "If you are driving at 20 mph (32 km/h) or below and have your blinker on, the car will plan a turn in that direction at the nearest drivable path. This prevents situations (like at red lights) where the car might plan the wrong turn direction."
   },
   "LaneTurnValue": {
-    "title": "Lane Turn Speed",
-    "description": "Maximum speed for lane turn desire",
+    "title": "Adjust Lane Turn Speed",
+    "description": "Set the maximum speed for lane turn desires. Default is 19 mph.",
     "min": 0,
     "max": 20,
     "step": 1
@@ -590,7 +598,7 @@
   },
   "LeadDepartAlert": {
     "title": "Lead Departure Alert (Beta)",
-    "description": "A chime and on-screen alert (TIZI/TICI only) will play when you are stopped, and the vehicle in front of you start moving. <br>Note: This chime is only designed as a notification. It is the driver's responsibility to observe their environment and make decisions accordingly."
+    "description": "A chime and on-screen alert will play when you are stopped, and the vehicle in front of you start moving. Note: This chime is only designed as a notification. It is the driver's responsibility to observe their environment and make decisions accordingly."
   },
   "LiveDelay": {
     "title": "Live Delay",
@@ -614,7 +622,7 @@
   },
   "LiveTorqueParamsToggle": {
     "title": "Self-Tune",
-    "description": "Enables self-tune for Torque lateral control"
+    "description": "Enables self-tune for Torque lateral control for platforms that do not use Torque lateral control by default."
   },
   "LocationFilterInitialState": {
     "title": "Location Filter Initial State",
@@ -626,7 +634,7 @@
   },
   "LongitudinalPersonality": {
     "title": "Driving Personality",
-    "description": "",
+    "description": "Standard is recommended. In aggressive mode, sunnypilot will follow lead cars closer and be more aggressive with the gas and brake. In relaxed mode sunnypilot will stay further away from lead cars. On supported cars, you can cycle through these personalities with your steering wheel distance button.",
     "options": [
       {
         "value": 0,
@@ -643,16 +651,16 @@
     ]
   },
   "Mads": {
-    "title": "MADS Enabled",
-    "description": ""
+    "title": "Modular Assistive Driving System (MADS)",
+    "description": "Enable the beloved MADS feature. Disable toggle to revert back to stock sunnypilot engagement/disengagement."
   },
   "MadsMainCruiseAllowed": {
-    "title": "MADS Main Cruise Allowed",
-    "description": ""
+    "title": "Toggle with Main Cruise",
+    "description": "Note: For vehicles without LFA/LKAS button, disabling this will prevent lateral control engagement."
   },
   "MadsSteeringMode": {
-    "title": "MADS Steering Mode",
-    "description": "",
+    "title": "Steering Mode on Brake Pedal",
+    "description": "Choose how Automatic Lane Centering (ALC) behaves after the brake pedal is manually pressed in sunnypilot.",
     "options": [
       {
         "value": 0,
@@ -669,8 +677,8 @@
     ]
   },
   "MadsUnifiedEngagementMode": {
-    "title": "MADS Unified Engagement Mode",
-    "description": ""
+    "title": "Unified Engagement Mode (UEM)",
+    "description": "Engage lateral and longitudinal control with cruise control engagement. Note: Once lateral control is engaged via UEM, it will remain engaged until it is manually disabled via the MADS button or car shut off."
   },
   "MapAdvisorySpeedLimit": {
     "title": "Map Advisory Speed Limit",
@@ -690,8 +698,57 @@
   },
   "MaxTimeOffroad": {
     "title": "Max Time Offroad",
-    "description": "",
-    "unit": "minutes"
+    "description": "Device will automatically shutdown after set time once the engine is turned off. 30h is the default.",
+    "options": [
+      {
+        "value": 0,
+        "label": "Always On"
+      },
+      {
+        "value": 1,
+        "label": "5m"
+      },
+      {
+        "value": 2,
+        "label": "10m"
+      },
+      {
+        "value": 3,
+        "label": "15m"
+      },
+      {
+        "value": 4,
+        "label": "30m"
+      },
+      {
+        "value": 5,
+        "label": "1h"
+      },
+      {
+        "value": 6,
+        "label": "2h"
+      },
+      {
+        "value": 7,
+        "label": "3h"
+      },
+      {
+        "value": 8,
+        "label": "5h"
+      },
+      {
+        "value": 9,
+        "label": "10h"
+      },
+      {
+        "value": 10,
+        "label": "24h"
+      },
+      {
+        "value": 11,
+        "label": "30h (Default)"
+      }
+    ]
   },
   "ModelManager_ActiveBundle": {
     "title": "Model Manager Active Bundle",
@@ -740,7 +797,7 @@
     ]
   },
   "NeuralNetworkLateralControl": {
-    "title": "Neural Network Lateral Control",
+    "title": "Neural Network Lateral Control (NNLC)",
     "description": ""
   },
   "NextMapSpeedLimit": {
@@ -1017,7 +1074,7 @@
   },
   "OpenpilotEnabledToggle": {
     "title": "Enable sunnypilot",
-    "description": ""
+    "description": "Use the sunnypilot system for adaptive cruise control and lane keep driver assistance. Your attention is required at all times to use this feature."
   },
   "OsmDbUpdatesCheck": {
     "title": "OSM DB Updates Check",
@@ -1079,7 +1136,7 @@
     "description": ""
   },
   "QuickBootToggle": {
-    "title": "Quick Boot",
+    "title": "Quickboot Mode",
     "description": ""
   },
   "QuietMode": {
@@ -1087,20 +1144,20 @@
     "description": ""
   },
   "RainbowMode": {
-    "title": "Rainbow Mode",
-    "description": ""
+    "title": "Enable Tesla Rainbow Mode",
+    "description": "A beautiful rainbow effect on the path the model wants to take. It does not affect driving in any way."
   },
   "RecordAudio": {
-    "title": "Record & Upload Mic Audio",
-    "description": ""
+    "title": "Record and Upload Microphone Audio",
+    "description": "Record and store microphone audio while driving. The audio will be included in the dashcam video in comma connect."
   },
   "RecordAudioFeedback": {
     "title": "Record Audio Feedback",
     "description": ""
   },
   "RecordFront": {
-    "title": "Record & Upload Driver Camera",
-    "description": ""
+    "title": "Record and Upload Driver Camera",
+    "description": "Upload data from the driver facing camera and help improve the driver monitoring algorithm."
   },
   "RecordFrontLock": {
     "title": "Record Front Lock",
@@ -1111,11 +1168,11 @@
     "description": ""
   },
   "RoadNameToggle": {
-    "title": "[TIZI/TICI only] Display Road Name",
-    "description": "Displays the name of the road the car is traveling on. <br>The OpenStreetMap database of the location must be downloaded to fetch the road name."
+    "title": "Display Road Name",
+    "description": "Displays the name of the road the car is traveling on. The OpenStreetMap database of the location must be downloaded to fetch the road name."
   },
   "RocketFuel": {
-    "title": "[TIZI/TICI only] Real-time Acceleration Bar",
+    "title": "Real-time Acceleration Bar",
     "description": "Show an indicator on the left side of the screen to display real-time vehicle acceleration and deceleration. This displays what the car is currently doing, not what the planner is requesting."
   },
   "RouteCount": {
@@ -1136,23 +1193,23 @@
   },
   "ShowAdvancedControls": {
     "title": "Show Advanced Controls",
-    "description": "Enable to show advanced controls on device"
+    "description": "Toggle visibility of advanced sunnypilot controls. This only changes the visibility of the toggles; it does not change the actual enabled/disabled state."
   },
   "ShowDebugInfo": {
     "title": "UI Debug Mode",
     "description": ""
   },
   "ShowTurnSignals": {
-    "title": "[TIZI/TICI only] Display Turn Signals",
+    "title": "Display Turn Signals",
     "description": "When enabled, visual turn indicators are drawn on the HUD."
   },
   "SmartCruiseControlMap": {
     "title": "Smart Cruise Control - Map",
-    "description": ""
+    "description": "Use map data to estimate the appropriate speed to drive through turns ahead."
   },
   "SmartCruiseControlVision": {
     "title": "Smart Cruise Control - Vision",
-    "description": ""
+    "description": "Use vision path predictions to estimate the appropriate speed to drive through turns ahead."
   },
   "SnoozeUpdate": {
     "title": "Snooze Update",
@@ -1236,15 +1293,15 @@
     "description": ""
   },
   "StandstillTimer": {
-    "title": "[TIZI/TICI only] Standstill Timer",
+    "title": "Enable Standstill Timer",
     "description": "Show a timer on the HUD when the car is at a standstill."
   },
   "SubaruStopAndGo": {
-    "title": "Subaru Stop and Go",
+    "title": "Stop and Go (Beta)",
     "description": ""
   },
   "SubaruStopAndGoManualParkingBrake": {
-    "title": "Subaru Stop and Go Manual Parking Brake",
+    "title": "Stop and Go for Manual Parking Brake (Beta)",
     "description": ""
   },
   "SunnylinkCache_Roles": {
@@ -1260,8 +1317,8 @@
     "description": ""
   },
   "SunnylinkEnabled": {
-    "title": "sunnylink Enabled",
-    "description": ""
+    "title": "Enable sunnylink",
+    "description": "This is the master switch, it will allow you to cutoff any sunnylink requests should you want to do that."
   },
   "SunnylinkTempFault": {
     "title": "sunnylink Temp Fault",
@@ -1276,11 +1333,11 @@
     "description": ""
   },
   "TeslaCoopSteering": {
-    "title": "Tesla Coop Steering",
+    "title": "Cooperative Steering (Beta)",
     "description": ""
   },
   "TorqueBar": {
-    "title": "[TIZI/TICI only] Steering Arc",
+    "title": "Steering Arc",
     "description": "Display steering arc on the driving screen when lateral control is enabled."
   },
   "TorqueControlTune": {
@@ -1303,29 +1360,29 @@
   },
   "TorqueParamsOverrideEnabled": {
     "title": "Manual Real-Time Tuning",
-    "description": ""
+    "description": "Enforces the torque lateral controller to use the fixed values instead of the learned values from Self-Tune. Enabling this toggle overrides Self-Tune values."
   },
   "TorqueParamsOverrideFriction": {
-    "title": "Manual Tune - Friction",
+    "title": "Friction",
     "description": "",
     "min": 0.0,
     "max": 1.0,
     "step": 0.01
   },
   "TorqueParamsOverrideLatAccelFactor": {
-    "title": "Manual Tune - Lateral Acceleration Factor",
+    "title": "Lateral Acceleration Factor",
     "description": "",
     "min": 0.1,
     "max": 5.0,
     "step": 0.1,
-    "unit": "m/s\u00b2"
+    "unit": "m/s²"
   },
   "ToyotaEnforceStockLongitudinal": {
-    "title": "Toyota: Enforce Factory Longitudinal Control",
-    "description": "When enabled, sunnypilot will not take over control of gas and brakes. Factory Toyota longitudinal control will be used."
+    "title": "Enforce Factory Longitudinal Control",
+    "description": "sunnypilot will not take over control of gas and brakes. Factory Toyota longitudinal control will be used."
   },
   "ToyotaStopAndGoHack": {
-    "title": "Toyota: Stop and Go Hack (Alpha)",
+    "title": "Stop and Go Hack (Alpha)",
     "description": "sunnypilot will allow some Toyota/Lexus cars to auto resume during stop and go traffic. This feature is only applicable to certain models that are able to use longitudinal control. This is an alpha feature. Use at your own risk."
   },
   "TrainingVersion": {
@@ -1333,7 +1390,7 @@
     "description": ""
   },
   "TrueVEgoUI": {
-    "title": "[TIZI/TICI only] Speedometer: Always Display True Speed",
+    "title": "Speedometer: Always Display True Speed",
     "description": "For applicable vehicles, always display the true vehicle current speed from wheel speed sensors."
   },
   "UbloxAvailable": {

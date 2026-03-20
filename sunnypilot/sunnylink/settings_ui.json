@@ -571,10 +571,6 @@
           ]
         },
         {
-          "key": "Brightness",
-          "widget": "option"
-        },
-        {
           "key": "InteractivityTimeout",
           "widget": "multiple_button"
         }
