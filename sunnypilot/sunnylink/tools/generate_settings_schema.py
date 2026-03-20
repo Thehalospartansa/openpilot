@@ -110,14 +110,35 @@ class SubPanel:
 
 
 @dataclass
+class PanelSection:
+  """A named group of items within a panel, rendered as a section with title + description."""
+  id: str
+  title: str
+  description: str | None = None
+  items: list[SchemaItem] = field(default_factory=list)
+  sub_panels: list[SubPanel] = field(default_factory=list)
+
+  def to_dict(self) -> dict:
+    d: dict = {"id": self.id, "title": self.title}
+    if self.description:
+      d["description"] = self.description
+    d["items"] = [item.to_dict() for item in self.items]
+    if self.sub_panels:
+      d["sub_panels"] = [sp.to_dict() for sp in self.sub_panels]
+    return d
+
+
+@dataclass
 class Panel:
   id: str
   label: str
   icon: str
   order: int
+  description: str | None = None
   remote_configurable: bool = True
-  items: list[SchemaItem] = field(default_factory=list)
-  sub_panels: list[SubPanel] = field(default_factory=list)
+  sections: list[PanelSection] = field(default_factory=list)
+  items: list[SchemaItem] = field(default_factory=list)  # backward compat: flat items (deprecated)
+  sub_panels: list[SubPanel] = field(default_factory=list)  # backward compat (deprecated)
 
   def to_dict(self) -> dict:
     d: dict = {
@@ -126,8 +147,13 @@ class Panel:
       "icon": self.icon,
       "order": self.order,
       "remote_configurable": self.remote_configurable,
-      "items": [item.to_dict() for item in self.items],
     }
+    if self.description:
+      d["description"] = self.description
+    if self.sections:
+      d["sections"] = [s.to_dict() for s in self.sections]
+    # Backward compat: also emit flat items/sub_panels for old frontends
+    d["items"] = [item.to_dict() for item in self.items]
     if self.sub_panels:
       d["sub_panels"] = [sp.to_dict() for sp in self.sub_panels]
     return d
@@ -140,6 +166,97 @@ class Panel:
 def _steering_panel() -> Panel:
   return Panel(
     id="steering", label="Steering", icon="steering_wheel", order=1,
+    description="Lateral control, lane changes, and steering behavior",
+    sections=[
+      PanelSection(
+        id="mads", title="MADS", description="Modified Assistive Driving Safety",
+        items=[
+          SchemaItem(key="Mads", widget="toggle",
+                     enablement=[offroad_only()]),
+        ],
+        sub_panels=[
+          SubPanel(
+            id="mads_settings", label="MADS Settings", trigger_key="Mads",
+            trigger_condition=param_eq("Mads", True),
+            items=[
+              SchemaItem(key="MadsMainCruiseAllowed", widget="toggle",
+                         enablement=[offroad_only()]),
+              SchemaItem(key="MadsUnifiedEngagementMode", widget="toggle",
+                         enablement=[offroad_only()]),
+              SchemaItem(key="MadsSteeringMode", widget="multiple_button",
+                         enablement=[offroad_only()]),
+            ],
+          ),
+        ],
+      ),
+      PanelSection(
+        id="blinker", title="Blinker Control", description="Lateral pause behavior during turn signals",
+        items=[
+          SchemaItem(key="BlinkerPauseLateralControl", widget="toggle",
+                     sub_items=[
+                       SchemaItem(key="BlinkerMinLateralControlSpeed", widget="option",
+                                  visibility=[param_eq("BlinkerPauseLateralControl", True)]),
+                       SchemaItem(key="BlinkerLateralReengageDelay", widget="option",
+                                  visibility=[param_eq("BlinkerPauseLateralControl", True)]),
+                     ]),
+        ],
+      ),
+      PanelSection(
+        id="torque", title="Torque Control", description="Steering torque tuning and lateral control method",
+        items=[
+          SchemaItem(key="EnforceTorqueControl", widget="toggle",
+                     visibility=[not_rule(cap("steer_control_type", "angle"))],
+                     enablement=[offroad_only(), cap("torque_allowed", True),
+                                 param_eq("NeuralNetworkLateralControl", False)]),
+          SchemaItem(key="NeuralNetworkLateralControl", widget="toggle",
+                     visibility=[not_rule(cap("steer_control_type", "angle"))],
+                     enablement=[offroad_only(), cap("torque_allowed", True),
+                                 param_eq("EnforceTorqueControl", False)]),
+        ],
+        sub_panels=[
+          SubPanel(
+            id="torque_settings", label="Torque Settings", trigger_key="EnforceTorqueControl",
+            trigger_condition=param_eq("EnforceTorqueControl", True),
+            items=[
+              SchemaItem(key="LiveTorqueParamsToggle", widget="toggle",
+                         enablement=[offroad_only()]),
+              SchemaItem(key="LiveTorqueParamsRelaxedToggle", widget="toggle",
+                         enablement=[offroad_only()],
+                         visibility=[param_eq("LiveTorqueParamsToggle", True)]),
+              SchemaItem(key="CustomTorqueParams", widget="toggle",
+                         enablement=[offroad_only()]),
+              SchemaItem(key="TorqueParamsOverrideEnabled", widget="toggle",
+                         enablement=[offroad_only()],
+                         visibility=[param_eq("CustomTorqueParams", True)]),
+              SchemaItem(key="TorqueParamsOverrideLatAccelFactor", widget="option",
+                         visibility=[param_eq("CustomTorqueParams", True)]),
+              SchemaItem(key="TorqueParamsOverrideFriction", widget="option",
+                         visibility=[param_eq("CustomTorqueParams", True)]),
+              SchemaItem(key="TorqueControlTune", widget="multiple_button",
+                         enablement=[offroad_only()]),
+            ],
+          ),
+        ],
+      ),
+      PanelSection(
+        id="lane_change", title="Lane Change", description="Automatic lane change timing and behavior",
+        items=[],
+        sub_panels=[
+          SubPanel(
+            id="lane_change_settings", label="Lane Change Settings", trigger_key="AutoLaneChangeTimer",
+            items=[
+              SchemaItem(key="AutoLaneChangeTimer", widget="multiple_button"),
+              SchemaItem(key="AutoLaneChangeBsmDelay", widget="toggle",
+                         enablement=[
+                           cap("enable_bsm", True),
+                           param_cmp("AutoLaneChangeTimer", ">", 0),
+                         ]),
+            ],
+          ),
+        ],
+      ),
+    ],
+    # Backward compat: flat items + sub_panels for old frontends
     items=[
       SchemaItem(key="Mads", widget="toggle",
                  enablement=[offroad_only()]),
@@ -212,6 +329,71 @@ def _steering_panel() -> Panel:
 def _cruise_panel() -> Panel:
   return Panel(
     id="cruise", label="Cruise", icon="cruise_control", order=2,
+    description="Longitudinal control, speed limits, and cruise behavior",
+    sections=[
+      PanelSection(
+        id="driving_personality", title="Driving Personality",
+        description="Adjust how aggressively the car follows traffic",
+        items=[
+          SchemaItem(key="LongitudinalPersonality", widget="multiple_button"),
+        ],
+      ),
+      PanelSection(
+        id="cruise_controls", title="Cruise Controls",
+        description="Button management and acceleration increments",
+        items=[
+          SchemaItem(key="IntelligentCruiseButtonManagement", widget="toggle",
+                     visibility=[cap("icbm_available", True)],
+                     enablement=[offroad_only()]),
+          SchemaItem(key="CustomAccIncrementsEnabled", widget="toggle",
+                     enablement=[offroad_only(),
+                                 any_of(cap("has_longitudinal_control", True), cap("has_icbm", True))],
+                     sub_items=[
+                       SchemaItem(key="CustomAccShortPressIncrement", widget="option",
+                                  visibility=[param_eq("CustomAccIncrementsEnabled", True)]),
+                       SchemaItem(key="CustomAccLongPressIncrement", widget="option",
+                                  visibility=[param_eq("CustomAccIncrementsEnabled", True)]),
+                     ]),
+        ],
+      ),
+      PanelSection(
+        id="speed_limits", title="Speed Limits",
+        description="Speed limit detection and offset behavior",
+        items=[],
+        sub_panels=[
+          SubPanel(
+            id="speed_limit_settings", label="Speed Limit Settings",
+            trigger_key="SpeedLimitMode",
+            items=[
+              SchemaItem(key="SpeedLimitMode", widget="multiple_button"),
+              SchemaItem(key="SpeedLimitPolicy", widget="multiple_button",
+                         visibility=[param_cmp("SpeedLimitMode", ">", 0)]),
+              SchemaItem(key="SpeedLimitOffsetType", widget="multiple_button",
+                         visibility=[param_cmp("SpeedLimitMode", ">", 0)]),
+              SchemaItem(key="SpeedLimitValueOffset", widget="option",
+                         visibility=[all_of(
+                           param_cmp("SpeedLimitMode", ">", 0),
+                           param_cmp("SpeedLimitOffsetType", ">", 0),
+                         )]),
+            ],
+          ),
+        ],
+      ),
+      PanelSection(
+        id="smart_cruise", title="Smart Cruise",
+        description="Dynamic and vision-based cruise enhancements",
+        items=[
+          SchemaItem(key="DynamicExperimentalControl", widget="toggle",
+                     visibility=[any_of(cap("has_longitudinal_control", True), cap("has_icbm", True))],
+                     enablement=[cap("has_longitudinal_control", True)]),
+          SchemaItem(key="SmartCruiseControlVision", widget="toggle",
+                     visibility=[any_of(cap("has_longitudinal_control", True), cap("has_icbm", True))]),
+          SchemaItem(key="SmartCruiseControlMap", widget="toggle",
+                     visibility=[any_of(cap("has_longitudinal_control", True), cap("has_icbm", True))]),
+        ],
+      ),
+    ],
+    # Backward compat: flat items + sub_panels for old frontends
     items=[
       SchemaItem(key="LongitudinalPersonality", widget="multiple_button"),
       SchemaItem(key="IntelligentCruiseButtonManagement", widget="toggle",
@@ -275,6 +457,42 @@ def _display_panel() -> Panel:
 def _visuals_panel() -> Panel:
   return Panel(
     id="visuals", label="Visuals", icon="visuals", order=4,
+    description="HUD overlays, alerts, and on-screen display elements",
+    sections=[
+      PanelSection(
+        id="hud_elements", title="HUD Elements",
+        description="Overlays shown on the driving screen",
+        items=[
+          SchemaItem(key="BlindSpot", widget="toggle"),
+          SchemaItem(key="TorqueBar", widget="toggle"),
+          SchemaItem(key="ShowTurnSignals", widget="toggle"),
+          SchemaItem(key="RoadNameToggle", widget="toggle"),
+          SchemaItem(key="StandstillTimer", widget="toggle"),
+          SchemaItem(key="RocketFuel", widget="toggle"),
+          SchemaItem(key="ChevronInfo", widget="multiple_button",
+                     enablement=[cap("has_longitudinal_control", True)]),
+        ],
+      ),
+      PanelSection(
+        id="developer_ui", title="Developer UI Info",
+        description="Speedometer and debug display options",
+        items=[
+          SchemaItem(key="DevUIInfo", widget="multiple_button"),
+          SchemaItem(key="TrueVEgoUI", widget="toggle"),
+          SchemaItem(key="HideVEgoUI", widget="toggle"),
+        ],
+      ),
+      PanelSection(
+        id="alerts_extras", title="Alerts & Extras",
+        description="Traffic light alerts and visual flair",
+        items=[
+          SchemaItem(key="GreenLightAlert", widget="toggle"),
+          SchemaItem(key="LeadDepartAlert", widget="toggle"),
+          SchemaItem(key="RainbowMode", widget="toggle"),
+        ],
+      ),
+    ],
+    # Backward compat
     items=[
       SchemaItem(key="BlindSpot", widget="toggle"),
       SchemaItem(key="TorqueBar", widget="toggle"),
@@ -316,6 +534,42 @@ def _toggles_panel() -> Panel:
 def _device_panel() -> Panel:
   return Panel(
     id="device", label="Device", icon="device", order=6,
+    description="Device behavior, units, and recording settings",
+    sections=[
+      PanelSection(
+        id="general", title="General",
+        description="Power, boot, and unit preferences",
+        items=[
+          SchemaItem(key="OffroadMode", widget="toggle"),
+          SchemaItem(key="DeviceBootMode", widget="multiple_button"),
+          SchemaItem(key="IsMetric", widget="toggle"),
+          SchemaItem(key="QuietMode", widget="toggle"),
+          SchemaItem(key="OnroadUploads", widget="toggle"),
+        ],
+      ),
+      PanelSection(
+        id="language", title="Language",
+        items=[
+          SchemaItem(key="LanguageSetting", widget="info"),
+        ],
+      ),
+      PanelSection(
+        id="recording", title="Recording",
+        description="Camera and audio recording during drives",
+        items=[
+          SchemaItem(key="RecordFront", widget="toggle"),
+          SchemaItem(key="RecordAudio", widget="toggle"),
+        ],
+      ),
+      PanelSection(
+        id="safety", title="Safety & Timeouts",
+        items=[
+          SchemaItem(key="MaxTimeOffroad", widget="option"),
+          SchemaItem(key="DisengageOnAccelerator", widget="toggle"),
+        ],
+      ),
+    ],
+    # Backward compat
     items=[
       SchemaItem(key="OffroadMode", widget="toggle"),
       SchemaItem(key="DeviceBootMode", widget="multiple_button"),
@@ -367,42 +621,57 @@ def _developer_panel() -> Panel:
   SP overlay (selfdrive/ui/sunnypilot/layouts/settings/developer.py):
     ShowAdvancedControls, EnableGithubRunner, EnableCopyparty, QuickBootToggle
   """
+  _upstream_items = [
+    SchemaItem(key="AdbEnabled", widget="toggle",
+               enablement=[offroad_only()]),
+    SchemaItem(key="SshEnabled", widget="toggle"),
+    SchemaItem(key="JoystickDebugMode", widget="toggle",
+               visibility=[not_rule(cap("is_release", True))],
+               enablement=[offroad_only()]),
+    SchemaItem(key="LongitudinalManeuverMode", widget="toggle",
+               visibility=[not_rule(cap("is_release", True))],
+               enablement=[offroad_only(), cap("has_longitudinal_control", True)]),
+    SchemaItem(key="AlphaLongitudinalEnabled", widget="toggle",
+               visibility=[all_of(
+                 cap("alpha_long_available", True),
+                 not_rule(cap("is_release", True)),
+               )]),
+    SchemaItem(key="ShowDebugInfo", widget="toggle"),
+  ]
+  _sp_items = [
+    SchemaItem(key="ShowAdvancedControls", widget="toggle"),
+    SchemaItem(key="EnableGithubRunner", widget="toggle",
+               visibility=[all_of(
+                 param_eq("ShowAdvancedControls", True),
+                 not_rule(cap("is_release", True)),
+               )]),
+    SchemaItem(key="EnableCopyparty", widget="toggle",
+               visibility=[param_eq("ShowAdvancedControls", True)]),
+    SchemaItem(key="QuickBootToggle", widget="toggle",
+               visibility=[all_of(
+                 param_eq("ShowAdvancedControls", True),
+                 not_rule(cap("is_release", True)),
+                 not_rule(cap("is_development", True)),
+               )],
+               enablement=[param_eq("DisableUpdates", True)]),
+  ]
   return Panel(
     id="developer", label="Developer", icon="developer", order=9,
-    items=[
-      # ── Upstream items ──
-      SchemaItem(key="AdbEnabled", widget="toggle",
-                 enablement=[offroad_only()]),
-      SchemaItem(key="SshEnabled", widget="toggle"),
-      SchemaItem(key="JoystickDebugMode", widget="toggle",
-                 visibility=[not_rule(cap("is_release", True))],
-                 enablement=[offroad_only()]),
-      SchemaItem(key="LongitudinalManeuverMode", widget="toggle",
-                 visibility=[not_rule(cap("is_release", True))],
-                 enablement=[offroad_only(), cap("has_longitudinal_control", True)]),
-      SchemaItem(key="AlphaLongitudinalEnabled", widget="toggle",
-                 visibility=[all_of(
-                   cap("alpha_long_available", True),
-                   not_rule(cap("is_release", True)),
-                 )]),
-      SchemaItem(key="ShowDebugInfo", widget="toggle"),
-      # ── SP overlay items ──
-      SchemaItem(key="ShowAdvancedControls", widget="toggle"),
-      SchemaItem(key="EnableGithubRunner", widget="toggle",
-                 visibility=[all_of(
-                   param_eq("ShowAdvancedControls", True),
-                   not_rule(cap("is_release", True)),
-                 )]),
-      SchemaItem(key="EnableCopyparty", widget="toggle",
-                 visibility=[param_eq("ShowAdvancedControls", True)]),
-      SchemaItem(key="QuickBootToggle", widget="toggle",
-                 visibility=[all_of(
-                   param_eq("ShowAdvancedControls", True),
-                   not_rule(cap("is_release", True)),
-                   not_rule(cap("is_development", True)),
-                 )],
-                 enablement=[param_eq("DisableUpdates", True)]),
+    description="Debug tools, remote access, and advanced services",
+    sections=[
+      PanelSection(
+        id="connectivity", title="Connectivity",
+        description="Remote access and debugging interfaces",
+        items=_upstream_items,
+      ),
+      PanelSection(
+        id="advanced_services", title="Advanced Services",
+        description="Additional services and boot options",
+        items=_sp_items,
+      ),
     ],
+    # Backward compat
+    items=_upstream_items + _sp_items,
   )
 
 
