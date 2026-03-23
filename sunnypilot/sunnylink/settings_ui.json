@@ -22,7 +22,9 @@
                 {
                   "type": "offroad_only"
                 }
-              ]
+              ],
+              "title": "Modular Assistive Driving System (MADS)",
+              "description": "Enable the beloved MADS feature. Disable toggle to revert back to stock sunnypilot engagement/disengagement."
             }
           ],
           "sub_panels": [
@@ -43,7 +45,9 @@
                     {
                       "type": "offroad_only"
                     }
-                  ]
+                  ],
+                  "title": "Toggle with Main Cruise",
+                  "description": "Note: For vehicles without LFA/LKAS button, disabling this will prevent lateral control engagement."
                 },
                 {
                   "key": "MadsUnifiedEngagementMode",
@@ -52,7 +56,9 @@
                     {
                       "type": "offroad_only"
                     }
-                  ]
+                  ],
+                  "title": "Unified Engagement Mode (UEM)",
+                  "description": "Engage lateral and longitudinal control with cruise control engagement. Note: Once lateral control is engaged via UEM, it will remain engaged until it is manually disabled via the MADS button or car shut off."
                 },
                 {
                   "key": "MadsSteeringMode",
@@ -60,6 +66,22 @@
                   "enablement": [
                     {
                       "type": "offroad_only"
+                    }
+                  ],
+                  "title": "Steering Mode on Brake Pedal",
+                  "description": "Choose how Automatic Lane Centering (ALC) behaves after the brake pedal is manually pressed in sunnypilot.",
+                  "options": [
+                    {
+                      "value": 0,
+                      "label": "Remain Active"
+                    },
+                    {
+                      "value": 1,
+                      "label": "Pause"
+                    },
+                    {
+                      "value": 2,
+                      "label": "Disengage"
                     }
                   ]
                 }
@@ -85,7 +107,12 @@
                       "key": "BlinkerPauseLateralControl",
                       "equals": true
                     }
-                  ]
+                  ],
+                  "title": "Minimum Speed to Pause Lateral Control",
+                  "min": 0,
+                  "max": 255,
+                  "step": 5,
+                  "unit": "km/h"
                 },
                 {
                   "key": "BlinkerLateralReengageDelay",
@@ -96,9 +123,17 @@
                       "key": "BlinkerPauseLateralControl",
                       "equals": true
                     }
-                  ]
+                  ],
+                  "title": "Post-Blinker Delay",
+                  "description": "Delay before lateral control resumes after the turn signal ends.",
+                  "min": 0,
+                  "max": 10,
+                  "step": 1,
+                  "unit": "s"
                 }
-              ]
+              ],
+              "title": "Pause Lateral Control with Blinker",
+              "description": "Pause lateral control with blinker when traveling below the desired speed selected."
             }
           ]
         },
@@ -134,7 +169,9 @@
                   "key": "NeuralNetworkLateralControl",
                   "equals": false
                 }
-              ]
+              ],
+              "title": "Enforce Torque Lateral Control",
+              "description": "Enable this to enforce sunnypilot to steer with Torque lateral control."
             },
             {
               "key": "NeuralNetworkLateralControl",
@@ -163,7 +200,8 @@
                   "key": "EnforceTorqueControl",
                   "equals": false
                 }
-              ]
+              ],
+              "title": "Neural Network Lateral Control (NNLC)"
             }
           ],
           "sub_panels": [
@@ -184,7 +222,9 @@
                     {
                       "type": "offroad_only"
                     }
-                  ]
+                  ],
+                  "title": "Self-Tune",
+                  "description": "Enables self-tune for Torque lateral control for platforms that do not use Torque lateral control by default."
                 },
                 {
                   "key": "LiveTorqueParamsRelaxedToggle",
@@ -200,7 +240,9 @@
                     {
                       "type": "offroad_only"
                     }
-                  ]
+                  ],
+                  "title": "Less Restrict Settings for Self-Tune (Beta)",
+                  "description": "Less strict settings when using Self-Tune. This allows torqued to be more forgiving when learning values."
                 },
                 {
                   "key": "CustomTorqueParams",
@@ -209,7 +251,9 @@
                     {
                       "type": "offroad_only"
                     }
-                  ]
+                  ],
+                  "title": "Enable Custom Tuning",
+                  "description": "Enables custom tuning for Torque lateral control. Modifying Lateral Acceleration Factor and Friction below will override the offline values indicated in the YAML files within \"opendbc/car/torque_data\". The values will also be used live when \"Manual Real-Time Tuning\" toggle is enabled."
                 },
                 {
                   "key": "TorqueParamsOverrideEnabled",
@@ -225,7 +269,9 @@
                     {
                       "type": "offroad_only"
                     }
-                  ]
+                  ],
+                  "title": "Manual Real-Time Tuning",
+                  "description": "Enforces the torque lateral controller to use the fixed values instead of the learned values from Self-Tune. Enabling this toggle overrides Self-Tune values."
                 },
                 {
                   "key": "TorqueParamsOverrideLatAccelFactor",
@@ -236,7 +282,12 @@
                       "key": "CustomTorqueParams",
                       "equals": true
                     }
-                  ]
+                  ],
+                  "title": "Lateral Acceleration Factor",
+                  "min": 0.1,
+                  "max": 5.0,
+                  "step": 0.1,
+                  "unit": "m/s\u00b2"
                 },
                 {
                   "key": "TorqueParamsOverrideFriction",
@@ -247,7 +298,11 @@
                       "key": "CustomTorqueParams",
                       "equals": true
                     }
-                  ]
+                  ],
+                  "title": "Friction",
+                  "min": 0.0,
+                  "max": 1.0,
+                  "step": 0.01
                 },
                 {
                   "key": "TorqueControlTune",
@@ -255,6 +310,22 @@
                   "enablement": [
                     {
                       "type": "offroad_only"
+                    }
+                  ],
+                  "title": "Torque Control Tune Version",
+                  "description": "Select the version of Torque Control Tune to use.",
+                  "options": [
+                    {
+                      "value": "",
+                      "label": "Default"
+                    },
+                    {
+                      "value": 1.0,
+                      "label": "v1.0"
+                    },
+                    {
+                      "value": 0.0,
+                      "label": "v0.0"
                     }
                   ]
                 }
@@ -275,7 +346,39 @@
               "items": [
                 {
                   "key": "AutoLaneChangeTimer",
-                  "widget": "multiple_button"
+                  "widget": "multiple_button",
+                  "title": "Auto Lane Change by Blinker",
+                  "description": "Set a timer to delay the auto lane change operation when the blinker is used. No nudge on the steering wheel is required to auto lane change if a timer is set. Default is Nudge. Please use caution when using this feature. Only use the blinker when traffic and road conditions permit.",
+                  "options": [
+                    {
+                      "value": -1,
+                      "label": "Off"
+                    },
+                    {
+                      "value": 0,
+                      "label": "Nudge"
+                    },
+                    {
+                      "value": 1,
+                      "label": "Nudgeless"
+                    },
+                    {
+                      "value": 2,
+                      "label": "0.5s"
+                    },
+                    {
+                      "value": 3,
+                      "label": "1s"
+                    },
+                    {
+                      "value": 4,
+                      "label": "2s"
+                    },
+                    {
+                      "value": 5,
+                      "label": "3s"
+                    }
+                  ]
                 },
                 {
                   "key": "AutoLaneChangeBsmDelay",
@@ -292,7 +395,9 @@
                       "op": ">",
                       "value": 0
                     }
-                  ]
+                  ],
+                  "title": "Auto Lane Change: Delay with Blind Spot",
+                  "description": "Toggle to enable a delay timer for seamless lane changes when blind spot monitoring (BSM) detects an obstructing vehicle, ensuring safe maneuvering."
                 }
               ]
             }
@@ -315,7 +420,23 @@
           "items": [
             {
               "key": "LongitudinalPersonality",
-              "widget": "multiple_button"
+              "widget": "multiple_button",
+              "title": "Driving Personality",
+              "description": "Standard is recommended. In aggressive mode, sunnypilot will follow lead cars closer and be more aggressive with the gas and brake. In relaxed mode sunnypilot will stay further away from lead cars. On supported cars, you can cycle through these personalities with your steering wheel distance button.",
+              "options": [
+                {
+                  "value": 0,
+                  "label": "Aggressive"
+                },
+                {
+                  "value": 1,
+                  "label": "Standard"
+                },
+                {
+                  "value": 2,
+                  "label": "Relaxed"
+                }
+              ]
             }
           ]
         },
@@ -338,7 +459,8 @@
                 {
                   "type": "offroad_only"
                 }
-              ]
+              ],
+              "title": "Intelligent Cruise Button Management (ICBM) (Alpha)"
             },
             {
               "key": "CustomAccIncrementsEnabled",
@@ -373,7 +495,11 @@
                       "key": "CustomAccIncrementsEnabled",
                       "equals": true
                     }
-                  ]
+                  ],
+                  "title": "Short Press Increment",
+                  "min": 1,
+                  "max": 10,
+                  "step": 1
                 },
                 {
                   "key": "CustomAccLongPressIncrement",
@@ -384,9 +510,14 @@
                       "key": "CustomAccIncrementsEnabled",
                       "equals": true
                     }
-                  ]
+                  ],
+                  "title": "Long Press Increment",
+                  "min": 1,
+                  "max": 10,
+                  "step": 1
                 }
-              ]
+              ],
+              "title": "Custom ACC Speed Increments"
             }
           ]
         },
@@ -403,7 +534,26 @@
               "items": [
                 {
                   "key": "SpeedLimitMode",
-                  "widget": "multiple_button"
+                  "widget": "multiple_button",
+                  "title": "Speed Limit Assist Mode",
+                  "options": [
+                    {
+                      "value": 0,
+                      "label": "Off"
+                    },
+                    {
+                      "value": 1,
+                      "label": "Information"
+                    },
+                    {
+                      "value": 2,
+                      "label": "Warning"
+                    },
+                    {
+                      "value": 3,
+                      "label": "Assist"
+                    }
+                  ]
                 },
                 {
                   "key": "SpeedLimitPolicy",
@@ -414,6 +564,29 @@
                       "key": "SpeedLimitMode",
                       "op": ">",
                       "value": 0
+                    }
+                  ],
+                  "title": "Speed Limit Source",
+                  "options": [
+                    {
+                      "value": 0,
+                      "label": "Car State Only"
+                    },
+                    {
+                      "value": 1,
+                      "label": "Map Data Only"
+                    },
+                    {
+                      "value": 2,
+                      "label": "Car State Priority"
+                    },
+                    {
+                      "value": 3,
+                      "label": "Map Data Priority"
+                    },
+                    {
+                      "value": 4,
+                      "label": "Combined"
                     }
                   ]
                 },
@@ -426,6 +599,21 @@
                       "key": "SpeedLimitMode",
                       "op": ">",
                       "value": 0
+                    }
+                  ],
+                  "title": "Speed Limit Offset Type",
+                  "options": [
+                    {
+                      "value": 0,
+                      "label": "Off"
+                    },
+                    {
+                      "value": 1,
+                      "label": "Fixed"
+                    },
+                    {
+                      "value": 2,
+                      "label": "Percentage"
                     }
                   ]
                 },
@@ -450,7 +638,11 @@
                         }
                       ]
                     }
-                  ]
+                  ],
+                  "title": "Speed Limit Offset Value",
+                  "min": -30,
+                  "max": 30,
+                  "step": 1
                 }
               ]
             }
@@ -487,7 +679,9 @@
                   "field": "has_longitudinal_control",
                   "equals": true
                 }
-              ]
+              ],
+              "title": "Enable Dynamic Experimental Control",
+              "description": "Enable toggle to allow the model to determine when to use sunnypilot ACC or sunnypilot End to End Longitudinal."
             },
             {
               "key": "SmartCruiseControlVision",
@@ -508,7 +702,9 @@
                     }
                   ]
                 }
-              ]
+              ],
+              "title": "Smart Cruise Control - Vision",
+              "description": "Use vision path predictions to estimate the appropriate speed to drive through turns ahead."
             },
             {
               "key": "SmartCruiseControlMap",
@@ -529,7 +725,9 @@
                     }
                   ]
                 }
-              ]
+              ],
+              "title": "Smart Cruise Control - Map",
+              "description": "Use map data to estimate the appropriate speed to drive through turns ahead."
             }
           ]
         }
@@ -550,7 +748,102 @@
           "items": [
             {
               "key": "OnroadScreenOffBrightness",
-              "widget": "multiple_button"
+              "widget": "multiple_button",
+              "title": "Onroad Brightness",
+              "options": [
+                {
+                  "value": 0,
+                  "label": "Auto (Default)"
+                },
+                {
+                  "value": 1,
+                  "label": "Auto (Dark)"
+                },
+                {
+                  "value": 2,
+                  "label": "Screen Off"
+                },
+                {
+                  "value": 3,
+                  "label": "5 %"
+                },
+                {
+                  "value": 4,
+                  "label": "10 %"
+                },
+                {
+                  "value": 5,
+                  "label": "15 %"
+                },
+                {
+                  "value": 6,
+                  "label": "20 %"
+                },
+                {
+                  "value": 7,
+                  "label": "25 %"
+                },
+                {
+                  "value": 8,
+                  "label": "30 %"
+                },
+                {
+                  "value": 9,
+                  "label": "35 %"
+                },
+                {
+                  "value": 10,
+                  "label": "40 %"
+                },
+                {
+                  "value": 11,
+                  "label": "45 %"
+                },
+                {
+                  "value": 12,
+                  "label": "50 %"
+                },
+                {
+                  "value": 13,
+                  "label": "55 %"
+                },
+                {
+                  "value": 14,
+                  "label": "60 %"
+                },
+                {
+                  "value": 15,
+                  "label": "65 %"
+                },
+                {
+                  "value": 16,
+                  "label": "70 %"
+                },
+                {
+                  "value": 17,
+                  "label": "75 %"
+                },
+                {
+                  "value": 18,
+                  "label": "80 %"
+                },
+                {
+                  "value": 19,
+                  "label": "85 %"
+                },
+                {
+                  "value": 20,
+                  "label": "90 %"
+                },
+                {
+                  "value": 21,
+                  "label": "95 %"
+                },
+                {
+                  "value": 22,
+                  "label": "100 %"
+                }
+              ]
             },
             {
               "key": "OnroadScreenOffTimer",
@@ -574,11 +867,110 @@
                     ]
                   }
                 }
+              ],
+              "title": "Onroad Brightness Delay",
+              "options": [
+                {
+                  "value": 0,
+                  "label": "Always On"
+                },
+                {
+                  "value": 3,
+                  "label": "3s"
+                },
+                {
+                  "value": 5,
+                  "label": "5s"
+                },
+                {
+                  "value": 10,
+                  "label": "10s"
+                },
+                {
+                  "value": 15,
+                  "label": "15s"
+                },
+                {
+                  "value": 30,
+                  "label": "30s"
+                },
+                {
+                  "value": 60,
+                  "label": "1m"
+                },
+                {
+                  "value": 180,
+                  "label": "3m"
+                },
+                {
+                  "value": 300,
+                  "label": "5m"
+                },
+                {
+                  "value": 600,
+                  "label": "10m"
+                }
               ]
             },
             {
               "key": "InteractivityTimeout",
-              "widget": "multiple_button"
+              "widget": "multiple_button",
+              "title": "Interactivity Timeout",
+              "description": "Apply a custom timeout for settings UI. This is the time after which settings UI closes automatically if user is not interacting with the screen.",
+              "options": [
+                {
+                  "value": 0,
+                  "label": "Default"
+                },
+                {
+                  "value": 10,
+                  "label": "10 s"
+                },
+                {
+                  "value": 20,
+                  "label": "20 s"
+                },
+                {
+                  "value": 30,
+                  "label": "30 s"
+                },
+                {
+                  "value": 40,
+                  "label": "40 s"
+                },
+                {
+                  "value": 50,
+                  "label": "50 s"
+                },
+                {
+                  "value": 60,
+                  "label": "1 m"
+                },
+                {
+                  "value": 70,
+                  "label": "1 m"
+                },
+                {
+                  "value": 80,
+                  "label": "1 m"
+                },
+                {
+                  "value": 90,
+                  "label": "1 m"
+                },
+                {
+                  "value": 100,
+                  "label": "1 m"
+                },
+                {
+                  "value": 110,
+                  "label": "1 m"
+                },
+                {
+                  "value": 120,
+                  "label": "2 m"
+                }
+              ]
             }
           ]
         }
@@ -599,38 +991,65 @@
           "items": [
             {
               "key": "BlindSpot",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Show Blind Spot Warnings",
+              "description": "Enabling this will display warnings when a vehicle is detected in your blind spot as long as your car has BSM supported."
             },
             {
               "key": "TorqueBar",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Steering Arc",
+              "description": "Display steering arc on the driving screen when lateral control is enabled."
             },
             {
               "key": "ShowTurnSignals",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Display Turn Signals",
+              "description": "When enabled, visual turn indicators are drawn on the HUD."
             },
             {
               "key": "RoadNameToggle",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Display Road Name",
+              "description": "Displays the name of the road the car is traveling on. The OpenStreetMap database of the location must be downloaded to fetch the road name."
             },
             {
               "key": "StandstillTimer",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Enable Standstill Timer",
+              "description": "Show a timer on the HUD when the car is at a standstill."
             },
             {
               "key": "RocketFuel",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Real-time Acceleration Bar",
+              "description": "Show an indicator on the left side of the screen to display real-time vehicle acceleration and deceleration. This displays what the car is currently doing, not what the planner is requesting."
             },
             {
               "key": "ChevronInfo",
               "title": "Display Metrics Below Chevron",
               "widget": "option",
               "options": [
-                { "value": 0, "label": "Off" },
-                { "value": 1, "label": "Distance" },
-                { "value": 2, "label": "Speed" },
-                { "value": 3, "label": "Time" },
-                { "value": 4, "label": "All" }
+                {
+                  "value": 0,
+                  "label": "Off"
+                },
+                {
+                  "value": 1,
+                  "label": "Distance"
+                },
+                {
+                  "value": 2,
+                  "label": "Speed"
+                },
+                {
+                  "value": 3,
+                  "label": "Time"
+                },
+                {
+                  "value": 4,
+                  "label": "All"
+                }
               ],
               "enablement": [
                 {
@@ -653,19 +1072,35 @@
               "description": "Display real-time parameters and metrics from various sources.",
               "widget": "option",
               "options": [
-                { "value": 0, "label": "Off" },
-                { "value": 1, "label": "Bottom" },
-                { "value": 2, "label": "Right" },
-                { "value": 3, "label": "Right & Bottom" }
+                {
+                  "value": 0,
+                  "label": "Off"
+                },
+                {
+                  "value": 1,
+                  "label": "Bottom"
+                },
+                {
+                  "value": 2,
+                  "label": "Right"
+                },
+                {
+                  "value": 3,
+                  "label": "Right & Bottom"
+                }
               ]
             },
             {
               "key": "TrueVEgoUI",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Speedometer: Always Display True Speed",
+              "description": "For applicable vehicles, always display the true vehicle current speed from wheel speed sensors."
             },
             {
               "key": "HideVEgoUI",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Speedometer: Hide from Onroad Screen",
+              "description": "When enabled, the speedometer on the onroad screen is not displayed."
             }
           ]
         },
@@ -676,15 +1111,21 @@
           "items": [
             {
               "key": "GreenLightAlert",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Green Traffic Light Alert (Beta)",
+              "description": "A chime and on-screen alert will play when the traffic light you are waiting for turns green and you have no vehicle in front of you. Note: This chime is only designed as a notification. It is the driver's responsibility to observe their environment and make decisions accordingly."
             },
             {
               "key": "LeadDepartAlert",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Lead Departure Alert (Beta)",
+              "description": "A chime and on-screen alert will play when you are stopped, and the vehicle in front of you start moving. Note: This chime is only designed as a notification. It is the driver's responsibility to observe their environment and make decisions accordingly."
             },
             {
               "key": "RainbowMode",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Enable Tesla Rainbow Mode",
+              "description": "A beautiful rainbow effect on the path the model wants to take. It does not affect driving in any way."
             }
           ]
         }
@@ -711,7 +1152,9 @@
                 {
                   "type": "offroad_only"
                 }
-              ]
+              ],
+              "title": "Enable sunnypilot",
+              "description": "Use the sunnypilot system for adaptive cruise control and lane keep driver assistance. Your attention is required at all times to use this feature."
             },
             {
               "key": "ExperimentalMode",
@@ -722,15 +1165,20 @@
                   "field": "has_longitudinal_control",
                   "equals": true
                 }
-              ]
+              ],
+              "title": "Experimental Mode"
             },
             {
               "key": "IsLdwEnabled",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Enable Lane Departure Warnings",
+              "description": "Receive alerts to steer back into the lane when your vehicle drifts over a detected lane line without a turn signal activated while driving over 31 mph (50 km/h)."
             },
             {
               "key": "AlwaysOnDM",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Always-On Driver Monitoring",
+              "description": "Enable driver monitoring even when sunnypilot is not engaged."
             }
           ]
         }
@@ -751,23 +1199,40 @@
           "items": [
             {
               "key": "OffroadMode",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Force Offroad Mode"
             },
             {
               "key": "DeviceBootMode",
-              "widget": "multiple_button"
+              "widget": "multiple_button",
+              "title": "Wake Up Behavior",
+              "description": "Controls state of the device after boot/sleep. Default: Device will boot/wake-up normally and will be ready to engage. Offroad: Device will be in Always Offroad mode after boot/wake-up.",
+              "options": [
+                {
+                  "value": 0,
+                  "label": "Standard"
+                },
+                {
+                  "value": 1,
+                  "label": "Always Offroad"
+                }
+              ]
             },
             {
               "key": "IsMetric",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Use Metric System",
+              "description": "Display speed in km/h instead of mph."
             },
             {
               "key": "QuietMode",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Quiet Mode"
             },
             {
               "key": "OnroadUploads",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Onroad Uploads"
             }
           ]
         },
@@ -777,7 +1242,8 @@
           "items": [
             {
               "key": "LanguageSetting",
-              "widget": "info"
+              "widget": "info",
+              "title": "Language"
             }
           ]
         },
@@ -789,12 +1255,16 @@
             {
               "key": "RecordFront",
               "widget": "toggle",
-              "needs_onroad_cycle": true
+              "needs_onroad_cycle": true,
+              "title": "Record and Upload Driver Camera",
+              "description": "Upload data from the driver facing camera and help improve the driver monitoring algorithm."
             },
             {
               "key": "RecordAudio",
               "widget": "toggle",
-              "needs_onroad_cycle": true
+              "needs_onroad_cycle": true,
+              "title": "Record and Upload Microphone Audio",
+              "description": "Record and store microphone audio while driving. The audio will be included in the dashcam video in comma connect."
             }
           ]
         },
@@ -804,11 +1274,65 @@
           "items": [
             {
               "key": "MaxTimeOffroad",
-              "widget": "option"
+              "widget": "option",
+              "title": "Max Time Offroad",
+              "description": "Device will automatically shutdown after set time once the engine is turned off. 30h is the default.",
+              "options": [
+                {
+                  "value": 0,
+                  "label": "Always On"
+                },
+                {
+                  "value": 1,
+                  "label": "5m"
+                },
+                {
+                  "value": 2,
+                  "label": "10m"
+                },
+                {
+                  "value": 3,
+                  "label": "15m"
+                },
+                {
+                  "value": 4,
+                  "label": "30m"
+                },
+                {
+                  "value": 5,
+                  "label": "1h"
+                },
+                {
+                  "value": 6,
+                  "label": "2h"
+                },
+                {
+                  "value": 7,
+                  "label": "3h"
+                },
+                {
+                  "value": 8,
+                  "label": "5h"
+                },
+                {
+                  "value": 9,
+                  "label": "10h"
+                },
+                {
+                  "value": 10,
+                  "label": "24h"
+                },
+                {
+                  "value": 11,
+                  "label": "30h (Default)"
+                }
+              ]
             },
             {
               "key": "DisengageOnAccelerator",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Disengage on Accelerator Pedal",
+              "description": "When enabled, pressing the accelerator pedal will disengage sunnypilot."
             }
           ]
         }
@@ -841,7 +1365,9 @@
                 {
                   "type": "offroad_only"
                 }
-              ]
+              ],
+              "title": "Disable Updates",
+              "description": "When enabled, automatic software updates will be off. This requires a reboot to take effect."
             }
           ]
         }
@@ -867,7 +1393,9 @@
                 {
                   "type": "offroad_only"
                 }
-              ]
+              ],
+              "title": "Enable sunnylink",
+              "description": "This is the master switch, it will allow you to cutoff any sunnylink requests should you want to do that."
             },
             {
               "key": "EnableSunnylinkUploader",
@@ -878,7 +1406,9 @@
                   "key": "SunnylinkEnabled",
                   "equals": true
                 }
-              ]
+              ],
+              "title": "Enable sunnylink uploader (infrastructure test)",
+              "description": "Enable sunnylink uploader to allow sunnypilot to upload your driving data to sunnypilot servers. Only for highest tiers, and does NOT bring ANY benefit to you yet. We are just testing data volume."
             }
           ]
         }
@@ -904,11 +1434,14 @@
                 {
                   "type": "offroad_only"
                 }
-              ]
+              ],
+              "title": "Enable ADB",
+              "description": "ADB (Android Debug Bridge) allows connecting to your device over USB or over the network. See https://docs.comma.ai/how-to/connect-to-comma for more info."
             },
             {
               "key": "SshEnabled",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Enable SSH"
             },
             {
               "key": "JoystickDebugMode",
@@ -927,7 +1460,8 @@
                 {
                   "type": "offroad_only"
                 }
-              ]
+              ],
+              "title": "Joystick Debug Mode"
             },
             {
               "key": "LongitudinalManeuverMode",
@@ -951,7 +1485,8 @@
                   "field": "has_longitudinal_control",
                   "equals": true
                 }
-              ]
+              ],
+              "title": "Longitudinal Maneuver Mode"
             },
             {
               "key": "AlphaLongitudinalEnabled",
@@ -976,11 +1511,14 @@
                     }
                   ]
                 }
-              ]
+              ],
+              "title": "sunnypilot Longitudinal Control (Alpha)",
+              "description": "WARNING: sunnypilot longitudinal control is in alpha for this car and will disable Automatic Emergency Braking (AEB). On this car, sunnypilot defaults to the car's built-in ACC instead of sunnypilot's longitudinal control. Enable this to switch to sunnypilot longitudinal control. Enabling Experimental mode is recommended when enabling sunnypilot longitudinal control alpha. Changing this setting will restart sunnypilot if the car is powered on."
             },
             {
               "key": "ShowDebugInfo",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "UI Debug Mode"
             }
           ]
         },
@@ -991,7 +1529,9 @@
           "items": [
             {
               "key": "ShowAdvancedControls",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Show Advanced Controls",
+              "description": "Toggle visibility of advanced sunnypilot controls. This only changes the visibility of the toggles; it does not change the actual enabled/disabled state."
             },
             {
               "key": "EnableGithubRunner",
@@ -1015,7 +1555,9 @@
                     }
                   ]
                 }
-              ]
+              ],
+              "title": "GitHub Runner Service",
+              "description": "Enables or disables the GitHub runner service."
             },
             {
               "key": "EnableCopyparty",
@@ -1026,7 +1568,9 @@
                   "key": "ShowAdvancedControls",
                   "equals": true
                 }
-              ]
+              ],
+              "title": "copyparty Service",
+              "description": "copyparty is a very capable file server, you can use it to download your routes, view your logs and even make some edits on some files from your browser. Requires you to connect to your comma locally via its IP address."
             },
             {
               "key": "QuickBootToggle",
@@ -1065,7 +1609,8 @@
                   "key": "DisableUpdates",
                   "equals": true
                 }
-              ]
+              ],
+              "title": "Quickboot Mode"
             }
           ]
         }
@@ -1086,7 +1631,9 @@
           "items": [
             {
               "key": "LaneTurnDesire",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Use Lane Turn Desires",
+              "description": "If you are driving at 20 mph (32 km/h) or below and have your blinker on, the car will plan a turn in that direction at the nearest drivable path. This prevents situations (like at red lights) where the car might plan the wrong turn direction."
             },
             {
               "key": "LaneTurnValue",
@@ -1107,11 +1654,18 @@
                     }
                   ]
                 }
-              ]
+              ],
+              "title": "Adjust Lane Turn Speed",
+              "description": "Set the maximum speed for lane turn desires. Default is 19 mph.",
+              "min": 0,
+              "max": 20,
+              "step": 1
             },
             {
               "key": "LagdToggle",
-              "widget": "toggle"
+              "widget": "toggle",
+              "title": "Live Learning Steer Delay",
+              "description": "Allow device to learn and adapt car's steering response time"
             },
             {
               "key": "LagdToggleDelay",
@@ -1135,7 +1689,12 @@
                     }
                   ]
                 }
-              ]
+              ],
+              "title": "Adjust Software Delay",
+              "description": "Adjust the software delay when Live Learning Steer Delay is toggled off. The default software delay value is 0.2",
+              "min": 0.05,
+              "max": 0.5,
+              "step": 0.01
             }
           ]
         },
@@ -1146,7 +1705,13 @@
           "items": [
             {
               "key": "CameraOffset",
-              "widget": "option"
+              "widget": "option",
+              "title": "Adjust Camera Offset",
+              "description": "Virtually shift camera's perspective to move model's center to Left(+ values) or Right (- values)",
+              "min": -0.35,
+              "max": 0.35,
+              "step": 0.01,
+              "unit": "meters"
             }
           ]
         }
@@ -1177,6 +1742,21 @@
               "field": "has_longitudinal_control",
               "equals": true
             }
+          ],
+          "title": "Custom Longitudinal Tuning",
+          "options": [
+            {
+              "value": 0,
+              "label": "Off"
+            },
+            {
+              "value": 1,
+              "label": "Dynamic"
+            },
+            {
+              "value": 2,
+              "label": "Predictive"
+            }
           ]
         }
       ]
@@ -1193,7 +1773,9 @@
             {
               "type": "offroad_only"
             }
-          ]
+          ],
+          "title": "Enforce Factory Longitudinal Control",
+          "description": "sunnypilot will not take over control of gas and brakes. Factory Toyota longitudinal control will be used."
         },
         {
           "key": "ToyotaStopAndGoHack",
@@ -1213,7 +1795,9 @@
               "key": "ToyotaEnforceStockLongitudinal",
               "equals": false
             }
-          ]
+          ],
+          "title": "Stop and Go Hack (Alpha)",
+          "description": "sunnypilot will allow some Toyota/Lexus cars to auto resume during stop and go traffic. This feature is only applicable to certain models that are able to use longitudinal control. This is an alpha feature. Use at your own risk."
         }
       ]
     },
@@ -1227,7 +1811,8 @@
             {
               "type": "offroad_only"
             }
-          ]
+          ],
+          "title": "Cooperative Steering (Beta)"
         }
       ]
     },
@@ -1246,7 +1831,8 @@
               "field": "has_stop_and_go",
               "equals": true
             }
-          ]
+          ],
+          "title": "Stop and Go (Beta)"
         },
         {
           "key": "SubaruStopAndGoManualParkingBrake",
@@ -1260,7 +1846,8 @@
               "field": "has_stop_and_go",
               "equals": true
             }
-          ]
+          ],
+          "title": "Stop and Go for Manual Parking Brake (Beta)"
         }
       ]
     }

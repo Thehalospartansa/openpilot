@@ -34,10 +34,6 @@ DEFAULT_PATH = os.path.join(
   os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
   "settings_ui.json",
 )
-METADATA_PATH = os.path.join(
-  os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-  "params_metadata.json",
-)
 
 
 class ValidationResult:
@@ -309,28 +305,33 @@ def check_structural(data: dict, result: ValidationResult) -> None:
     result.ok("structural")
 
 
-def check_param_existence(data: dict, result: ValidationResult) -> None:
-  """Check 3: Item keys exist in params_metadata.json (warnings only)."""
-  try:
-    with open(METADATA_PATH) as f:
-      metadata = json.load(f)
-  except (FileNotFoundError, json.JSONDecodeError):
-    result.error("param existence", f"could not load metadata from {METADATA_PATH}")
-    return
-
-  known_keys = set(metadata.keys())
+def check_item_completeness(data: dict, result: ValidationResult) -> None:
+  """Check 3: All items have required metadata (title, options for dropdowns)."""
   all_items = collect_all_items(data)
-  missing: list[str] = []
+  issues: list[str] = []
 
   for path, item in all_items:
-    key = item.get("key")
-    if key and key not in known_keys:
-      missing.append(key)
+    key = item.get("key", "unknown")
+    if "title" not in item:
+      issues.append(f"{key}: missing 'title'")
+    elif item["title"] == key:
+      issues.append(f"{key}: title must not equal key (use a human-readable title)")
+    widget = item.get("widget")
+    if widget in ("multiple_button", "option") and "options" in item:
+      opts = item["options"]
+      if not isinstance(opts, list):
+        issues.append(f"{key}: options must be a list")
+      else:
+        for opt in opts:
+          if not isinstance(opt, dict) or "value" not in opt or "label" not in opt:
+            issues.append(f"{key}: each option must have 'value' and 'label'")
+            break
 
-  if missing:
-    for key in missing:
-      result.warn(f"param existence: key '{key}' not found in params_metadata.json")
-  result.ok("param existence")
+  if issues:
+    for issue in issues:
+      result.error("item completeness", issue)
+  else:
+    result.ok("item completeness")
 
 
 def check_no_duplicate_keys(data: dict, result: ValidationResult) -> None:
@@ -515,7 +516,7 @@ def validate(path: str) -> bool:
 
   # Checks 2-10
   check_structural(data, result)
-  check_param_existence(data, result)
+  check_item_completeness(data, result)
   check_no_duplicate_keys(data, result)
   check_rule_wellformedness(data, result)
   check_capability_refs(data, result)

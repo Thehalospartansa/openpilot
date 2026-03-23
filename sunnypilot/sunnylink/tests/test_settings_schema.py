@@ -25,7 +25,7 @@ from openpilot.sunnypilot.sunnylink.capabilities import CAPABILITY_FIELDS
 VALID_WIDGET_TYPES = {"toggle", "option", "multiple_button", "button", "info"}
 VALID_RULE_TYPES = {"offroad_only", "capability", "param", "param_compare", "not", "any", "all"}
 VALID_COMPARE_OPS = {">", "<", ">=", "<="}
-MAX_ALLOWED_MISSING_TITLES = 5
+MAX_ALLOWED_MISSING_TITLES = 0  # All items must have titles (metadata is inline in settings_ui.json)
 
 
 @pytest.fixture(scope="module")
@@ -266,26 +266,67 @@ class TestKnownVehicleSettings:
 
 
 # ---------------------------------------------------------------------------
-# Metadata enrichment
+# Item completeness (metadata is inline in settings_ui.json)
 # ---------------------------------------------------------------------------
 
-class TestMetadataEnrichment:
-  def test_items_have_titles(self, schema):
-    """Most items should have titles after metadata merge (panels + sub-panels)."""
-    missing_titles = []
+class TestItemCompleteness:
+  def _collect_all_items(self, schema):
+    """Collect all items from panels, sub_panels, sub_items, and vehicle_settings."""
+    items = []
     for panel in schema["panels"]:
       for item in panel["items"]:
-        if "title" not in item:
-          missing_titles.append(item["key"])
+        items.append(item)
+        for sub in item.get("sub_items", []):
+          items.append(sub)
       for sp in panel.get("sub_panels", []):
         for item in sp["items"]:
-          if "title" not in item:
-            missing_titles.append(item["key"])
-    if len(missing_titles) > MAX_ALLOWED_MISSING_TITLES:
-      pytest.fail(f"Too many items without titles ({len(missing_titles)}): {missing_titles[:10]}")
+          items.append(item)
+          for sub in item.get("sub_items", []):
+            items.append(sub)
+    for brand_items in schema.get("vehicle_settings", {}).values():
+      if isinstance(brand_items, list):
+        items.extend(brand_items)
+      elif isinstance(brand_items, dict):
+        items.extend(brand_items.get("items", []))
+    return items
+
+  def test_all_items_have_titles(self, schema):
+    """Every item must have a title (metadata is inline, no enrichment fallback)."""
+    missing = [i["key"] for i in self._collect_all_items(schema) if "title" not in i]
+    if len(missing) > MAX_ALLOWED_MISSING_TITLES:
+      pytest.fail(f"Items without titles ({len(missing)}): {missing[:10]}")
+
+  def test_no_default_titles(self, schema):
+    """No item should have title == key (forces human-readable titles)."""
+    defaults = [i["key"] for i in self._collect_all_items(schema) if i.get("title") == i["key"]]
+    assert not defaults, f"Items with default titles (title == key): {defaults}"
+
+  def test_options_structure(self, schema):
+    """Options must be list of {{value, label}} dicts."""
+    for item in self._collect_all_items(schema):
+      opts = item.get("options")
+      if opts is None:
+        continue
+      assert isinstance(opts, list), f"{item['key']}: options must be a list"
+      for opt in opts:
+        assert isinstance(opt, dict), f"{item['key']}: each option must be a dict"
+        assert "value" in opt, f"{item['key']}: option missing 'value': {opt}"
+        assert "label" in opt, f"{item['key']}: option missing 'label': {opt}"
+
+  def test_numeric_constraints(self, schema):
+    """If min/max/step present, all three must be present and min < max."""
+    for item in self._collect_all_items(schema):
+      has_min = "min" in item
+      has_max = "max" in item
+      has_step = "step" in item
+      if has_min or has_max or has_step:
+        assert has_min and has_max and has_step, \
+          f"{item['key']}: must have all of min/max/step or none"
+        assert item["min"] < item["max"], \
+          f"{item['key']}: min ({item['min']}) must be < max ({item['max']})"
 
   def test_known_param_has_options(self, schema):
-    """LongitudinalPersonality should have 3 options after enrichment."""
+    """LongitudinalPersonality should have 3 options."""
     cruise = next(p for p in schema["panels"] if p["id"] == "cruise")
     lp = next((i for i in cruise["items"] if i["key"] == "LongitudinalPersonality"), None)
     assert lp is not None
