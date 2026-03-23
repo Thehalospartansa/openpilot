@@ -623,7 +623,15 @@
             },
             {
               "key": "ChevronInfo",
-              "widget": "multiple_button",
+              "title": "Display Metrics Below Chevron",
+              "widget": "option",
+              "options": [
+                { "value": 0, "label": "Off" },
+                { "value": 1, "label": "Distance" },
+                { "value": 2, "label": "Speed" },
+                { "value": 3, "label": "Time" },
+                { "value": 4, "label": "All" }
+              ],
               "enablement": [
                 {
                   "type": "capability",
@@ -641,7 +649,15 @@
           "items": [
             {
               "key": "DevUIInfo",
-              "widget": "multiple_button"
+              "title": "Developer UI",
+              "description": "Display real-time parameters and metrics from various sources.",
+              "widget": "option",
+              "options": [
+                { "value": 0, "label": "Off" },
+                { "value": 1, "label": "Bottom" },
+                { "value": 2, "label": "Right" },
+                { "value": 3, "label": "Right & Bottom" }
+              ]
             },
             {
               "key": "TrueVEgoUI",
