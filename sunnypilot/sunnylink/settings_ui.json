@@ -112,7 +112,7 @@
                   "min": 0,
                   "max": 255,
                   "step": 5,
-                  "unit": "km/h"
+                  "unit": {"metric": "km/h", "imperial": "mph"}
                 },
                 {
                   "key": "BlinkerLateralReengageDelay",
@@ -642,7 +642,8 @@
                   "title": "Speed Limit Offset Value",
                   "min": -30,
                   "max": 30,
-                  "step": 1
+                  "step": 1,
+                  "unit": {"metric": "km/h", "imperial": "mph"}
                 }
               ]
             }
@@ -1656,10 +1657,11 @@
                 }
               ],
               "title": "Adjust Lane Turn Speed",
-              "description": "Set the maximum speed for lane turn desires. Default is 19 mph.",
+              "description": "Set the maximum speed for lane turn desires.",
               "min": 0,
               "max": 20,
-              "step": 1
+              "step": 1,
+              "unit": {"metric": "km/h", "imperial": "mph"}
             },
             {
               "key": "LagdToggle",

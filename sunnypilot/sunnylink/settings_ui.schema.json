@@ -172,8 +172,29 @@
           "description": "Step increment for numeric option widgets."
         },
         "unit": {
-          "type": "string",
-          "description": "Unit label for numeric values (e.g. 'mph', 'seconds')."
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Static unit label (e.g. 'seconds', 'm/s²')."
+            },
+            {
+              "type": "object",
+              "description": "Dynamic unit that changes based on IsMetric param.",
+              "required": ["metric", "imperial"],
+              "additionalProperties": false,
+              "properties": {
+                "metric": {
+                  "type": "string",
+                  "description": "Unit label when IsMetric is true (e.g. 'km/h')."
+                },
+                "imperial": {
+                  "type": "string",
+                  "description": "Unit label when IsMetric is false (e.g. 'mph')."
+                }
+              }
+            }
+          ],
+          "description": "Unit label for numeric values. Use a string for static units or an object with metric/imperial variants for units that depend on the IsMetric param."
         },
         "value_map": {
           "type": "object",

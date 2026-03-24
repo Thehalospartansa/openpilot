@@ -31,7 +31,7 @@ All metadata (titles, descriptions, options, min/max/step/unit) lives **inline o
 | `description` | No | Explanatory text below the title |
 | `options` | For selectors | Array of `{"value": 0, "label": "Off"}` objects |
 | `min`, `max`, `step` | For sliders | Numeric range constraints |
-| `unit` | No | Unit label (e.g., `"seconds"`, `"mph"`) |
+| `unit` | No | Unit label. Static: `"seconds"`. Dynamic: `{"metric": "km/h", "imperial": "mph"}` (resolved by IsMetric) |
 | `visibility` | No | Rules for show/hide (all must pass) |
 | `enablement` | No | Rules for enabled/disabled (all must pass) |
 | `sub_items` | No | Nested child items |
@@ -118,6 +118,24 @@ Capability fields: `has_longitudinal_control`, `has_icbm`, `icbm_available`, `to
   "unit": "seconds"
 }
 ```
+
+### Add a slider with metric/imperial unit
+
+For speed or distance values that change based on the user's `IsMetric` preference:
+
+```json
+{
+  "key": "MinSpeed",
+  "widget": "option",
+  "title": "Minimum Speed",
+  "min": 0,
+  "max": 100,
+  "step": 5,
+  "unit": {"metric": "km/h", "imperial": "mph"}
+}
+```
+
+The frontend resolves the correct unit string based on the device's `IsMetric` param value. Static units (like `"seconds"`, `"m/s²"`) remain plain strings.
 
 ### Add a dropdown
 

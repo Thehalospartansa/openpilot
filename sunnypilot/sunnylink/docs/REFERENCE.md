@@ -169,7 +169,7 @@ Root
 | `min` | For sliders | Minimum value (renders `option` widget as a slider) |
 | `max` | For sliders | Maximum value |
 | `step` | For sliders | Step increment |
-| `unit` | No | Unit label displayed next to values (e.g., `"seconds"`, `"mph"`) |
+| `unit` | No | Unit label. Static: `"seconds"`. Dynamic: `{"metric": "km/h", "imperial": "mph"}` (frontend resolves based on `IsMetric` param). See [Dynamic Units](#dynamic-units). |
 | `value_map` | No | Maps stored values to display labels |
 | `visibility` | No | Rules that control show/hide (all must pass) |
 | `enablement` | No | Rules that control enabled/disabled (all must pass) |
@@ -758,6 +758,51 @@ These panels exist on the device but are intentionally excluded from the schema 
 | Lock params | `{Param}Lock` disables user control | Not needed for remote config |
 | Metric scaling | Speed values scale by IsMetric | Frontend reads IsMetric and formats accordingly |
 | Mutual exclusion side effects | JoystickDebugMode resets LongitudinalManeuverMode | Frontend uses enablement rules only (no cross-param reset) |
+
+---
+
+## Dynamic Units
+
+Speed and distance units depend on the user's `IsMetric` preference. The `unit` field supports two forms:
+
+**Static** (constant regardless of IsMetric):
+```json
+"unit": "seconds"
+"unit": "m/s²"
+"unit": "meters"
+```
+
+**Dynamic** (resolved by the frontend based on `IsMetric` param):
+```json
+"unit": {"metric": "km/h", "imperial": "mph"}
+```
+
+The frontend reads `IsMetric` from the device's param values and displays the appropriate string. When `IsMetric` is `true` or `1`, the `metric` value is shown. Otherwise, the `imperial` value is shown.
+
+### Items with dynamic units
+
+| Param | Unit |
+|-------|------|
+| `BlinkerMinLateralControlSpeed` | `{"metric": "km/h", "imperial": "mph"}` |
+| `SpeedLimitValueOffset` | `{"metric": "km/h", "imperial": "mph"}` |
+| `LaneTurnValue` | `{"metric": "km/h", "imperial": "mph"}` |
+
+### When to use dynamic units
+
+Use `{"metric": ..., "imperial": ...}` whenever the param stores a value whose interpretation depends on `IsMetric`. This includes:
+- Speed values (km/h vs mph)
+- Distance values (km vs mi) if applicable
+
+Use a plain string when the unit is always the same regardless of user preference (seconds, m/s², meters, percentages).
+
+### Descriptions with speed references
+
+For **fixed thresholds** in descriptions (not user-configurable), include both units inline:
+```json
+"description": "Alerts when driving over 31 mph (50 km/h)."
+```
+
+For **user-configurable values**, use the `unit` field instead of embedding units in the description.
 
 ---
 
