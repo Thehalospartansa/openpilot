@@ -112,7 +112,7 @@
                   "min": 0,
                   "max": 255,
                   "step": 5,
-                  "unit": {"metric": "km/h", "imperial": "mph"}
+                  "unit": {"metric": "km/h", "imperial": "MPH"}
                 },
                 {
                   "key": "BlinkerLateralReengageDelay",
@@ -129,7 +129,7 @@
                   "min": 0,
                   "max": 10,
                   "step": 1,
-                  "unit": "s"
+                  "unit": "second"
                 }
               ],
               "title": "Pause Lateral Control with Blinker",
@@ -643,7 +643,7 @@
                   "min": -30,
                   "max": 30,
                   "step": 1,
-                  "unit": {"metric": "km/h", "imperial": "mph"}
+                  "unit": {"metric": "km/h", "imperial": "MPH"}
                 }
               ]
             }
@@ -1182,6 +1182,27 @@
               "description": "Enable driver monitoring even when sunnypilot is not engaged."
             }
           ]
+        },
+        {
+          "id": "recording",
+          "title": "Recording",
+          "description": "Camera and audio recording during drives",
+          "items": [
+            {
+              "key": "RecordFront",
+              "widget": "toggle",
+              "needs_onroad_cycle": true,
+              "title": "Record and Upload Driver Camera",
+              "description": "Upload data from the driver facing camera and help improve the driver monitoring algorithm."
+            },
+            {
+              "key": "RecordAudio",
+              "widget": "toggle",
+              "needs_onroad_cycle": true,
+              "title": "Record and Upload Microphone Audio",
+              "description": "Record and store microphone audio while driving. The audio will be included in the dashcam video in comma connect."
+            }
+          ]
         }
       ]
     },
@@ -1245,27 +1266,6 @@
               "key": "LanguageSetting",
               "widget": "info",
               "title": "Language"
-            }
-          ]
-        },
-        {
-          "id": "recording",
-          "title": "Recording",
-          "description": "Camera and audio recording during drives",
-          "items": [
-            {
-              "key": "RecordFront",
-              "widget": "toggle",
-              "needs_onroad_cycle": true,
-              "title": "Record and Upload Driver Camera",
-              "description": "Upload data from the driver facing camera and help improve the driver monitoring algorithm."
-            },
-            {
-              "key": "RecordAudio",
-              "widget": "toggle",
-              "needs_onroad_cycle": true,
-              "title": "Record and Upload Microphone Audio",
-              "description": "Record and store microphone audio while driving. The audio will be included in the dashcam video in comma connect."
             }
           ]
         },
@@ -1661,7 +1661,7 @@
               "min": 0,
               "max": 20,
               "step": 1,
-              "unit": {"metric": "km/h", "imperial": "mph"}
+              "unit": {"metric": "km/h", "imperial": "MPH"}
             },
             {
               "key": "LagdToggle",
