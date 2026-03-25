@@ -10,6 +10,7 @@ from cereal import car, custom, messaging
 from opendbc.sunnypilot.car.tesla.values import TeslaFlagsSP
 from openpilot.common.params import Params
 from openpilot.common.swaglog import cloudlog
+from openpilot.system.hardware import HARDWARE
 
 
 # All capability fields that rules may reference.
@@ -30,6 +31,7 @@ CAPABILITY_FIELDS = (
   "tesla_has_vehicle_bus",
   "has_stop_and_go",
   "stock_longitudinal",
+  "device_type",
 )
 
 CAPABILITY_LABELS: dict[str, str] = {
@@ -48,12 +50,14 @@ CAPABILITY_LABELS: dict[str, str] = {
   "tesla_has_vehicle_bus": "Tesla vehicle bus",
   "has_stop_and_go": "Stop and Go",
   "stock_longitudinal": "stock longitudinal",
+  "device_type": "Device type",
 }
 
 # Explicit defaults for non-boolean capability fields
 CAPABILITY_DEFAULTS: dict[str, bool | str] = {
   "brand": "",
   "steer_control_type": "",
+  "device_type": "",
 }
 
 
@@ -73,7 +77,8 @@ def generate_capabilities(params: Params | None = None) -> dict:
 
   caps: dict = {field: CAPABILITY_DEFAULTS.get(field, False) for field in CAPABILITY_FIELDS}
 
-  # Phase 2: Boolean params (no CarParams dependency)
+  # Phase 2: Hardware + boolean params (no CarParams dependency)
+  caps["device_type"] = HARDWARE.get_device_type()
   caps["is_release"] = params.get_bool("IsReleaseBranch")
   caps["is_sp_release"] = params.get_bool("IsReleaseSpBranch")
   caps["is_development"] = params.get_bool("IsDevelopmentBranch")

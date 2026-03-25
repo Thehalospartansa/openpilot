@@ -1276,19 +1276,22 @@
               "key": "RoadNameToggle",
               "widget": "toggle",
               "title": "Display Road Name",
-              "description": "Displays the name of the road the car is traveling on. The OpenStreetMap database of the location must be downloaded to fetch the road name."
+              "description": "Displays the name of the road the car is traveling on. The OpenStreetMap database of the location must be downloaded to fetch the road name.",
+              "visibility": [{"type": "not", "condition": {"type": "capability", "field": "device_type", "equals": "mici"}}]
             },
             {
               "key": "StandstillTimer",
               "widget": "toggle",
               "title": "Standstill Timer",
-              "description": "Show a timer on the HUD when the car is at a standstill."
+              "description": "Show a timer on the HUD when the car is at a standstill.",
+              "visibility": [{"type": "not", "condition": {"type": "capability", "field": "device_type", "equals": "mici"}}]
             },
             {
               "key": "RocketFuel",
               "widget": "toggle",
               "title": "Real-time Acceleration Bar",
-              "description": "Show an indicator on the left side of the screen to display real-time vehicle acceleration and deceleration. This displays what the car is currently doing, not what the planner is requesting."
+              "description": "Show an indicator on the left side of the screen to display real-time vehicle acceleration and deceleration. This displays what the car is currently doing, not what the planner is requesting.",
+              "visibility": [{"type": "not", "condition": {"type": "capability", "field": "device_type", "equals": "mici"}}]
             },
             {
               "key": "ChevronInfo",
@@ -1316,6 +1319,7 @@
                   "label": "All"
                 }
               ],
+              "visibility": [{"type": "not", "condition": {"type": "capability", "field": "device_type", "equals": "mici"}}],
               "enablement": [
                 {
                   "type": "capability",
@@ -1330,6 +1334,7 @@
           "id": "developer_ui",
           "title": "Developer UI Info",
           "description": "Speedometer and debug display options",
+          "visibility": [{"type": "not", "condition": {"type": "capability", "field": "device_type", "equals": "mici"}}],
           "items": [
             {
               "key": "DevUIInfo",
@@ -1378,13 +1383,13 @@
               "key": "GreenLightAlert",
               "widget": "toggle",
               "title": "Green Traffic Light Alert (Beta)",
-              "description": "A chime and on-screen alert will play when the traffic light you are waiting for turns green and you have no vehicle in front of you. Note: This chime is only designed as a notification. It is the driver's responsibility to observe their environment and make decisions accordingly."
+              "description": "A chime and on-screen alert will play when the traffic light you are waiting for turns green and you have no vehicle in front of you. On-screen visual alert is only available on comma 3X. Note: This chime is only designed as a notification. It is the driver's responsibility to observe their environment and make decisions accordingly."
             },
             {
               "key": "LeadDepartAlert",
               "widget": "toggle",
               "title": "Lead Departure Alert (Beta)",
-              "description": "A chime and on-screen alert will play when you are stopped, and the vehicle in front of you start moving. Note: This chime is only designed as a notification. It is the driver's responsibility to observe their environment and make decisions accordingly."
+              "description": "A chime and on-screen alert will play when you are stopped, and the vehicle in front of you start moving. On-screen visual alert is only available on comma 3X. Note: This chime is only designed as a notification. It is the driver's responsibility to observe their environment and make decisions accordingly."
             },
             {
               "key": "RainbowMode",
