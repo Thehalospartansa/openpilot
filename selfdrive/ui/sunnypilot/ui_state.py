@@ -26,22 +26,22 @@ class OnroadTimerStatus(Enum):
 
 class UIStateSP:
   def __init__(self):
-    self.CP_SP: custom.CarParamsSP | None = None
     self.params = Params()
+    self.CP_SP: custom.CarParamsSP | None = None
+    self.has_icbm: bool = False
+    self.is_sp_release: bool = self.params.get_bool("IsReleaseSpBranch")
     self.sm_services_ext = [
       "modelManagerSP", "selfdriveStateSP", "longitudinalPlanSP", "backupManagerSP",
       "gpsLocation", "liveTorqueParameters", "carStateSP", "liveMapDataSP", "carParamsSP", "liveDelay"
     ]
 
     self.sunnylink_state = SunnylinkState()
-    self.update_params()
 
     self.onroad_brightness_timer: int = 0
     self.custom_interactive_timeout: int = self.params.get("InteractivityTimeout", return_default=True)
     self.reset_onroad_sleep_timer()
-    self.CP_SP: custom.CarParamsSP | None = None
-    self.has_icbm: bool = False
-    self.is_sp_release: bool = self.params.get_bool("IsReleaseSpBranch")
+
+    self.update_params()
 
   def update(self) -> None:
     if self.sunnylink_enabled:
@@ -150,9 +150,9 @@ class UIStateSP:
     self.boot_offroad_mode = self.params.get("DeviceBootMode", return_default=True)
 
   def _enforce_sp_constraints(self) -> None:
-    has_long = self.has_longitudinal_control if hasattr(self, 'has_longitudinal_control') else False
+    has_long = getattr(self, 'has_longitudinal_control', False)
     has_icbm = self.has_icbm
-    CP = self.CP if hasattr(self, 'CP') else None
+    CP = getattr(self, 'CP', None)
 
     if CP is not None:
       # Angle steering: no torque-based lateral controls
