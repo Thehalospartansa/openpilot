@@ -1887,8 +1887,8 @@
   ],
   "vehicle_settings": {
     "hyundai": {
-      "title": "Hyundai, Kia, Genesis Settings",
-      "description": "Brand-specific settings for Hyundai, Kia, and Genesis vehicles",
+      "title": "Hyundai / Kia / Genesis Settings",
+      "description": "",
       "items": [
         {
           "key": "HyundaiLongitudinalTuning",
@@ -1930,7 +1930,7 @@
     },
     "toyota": {
       "title": "Toyota / Lexus Settings",
-      "description": "Brand-specific settings for Toyota and Lexus vehicles",
+      "description": "",
       "items": [
         {
           "key": "ToyotaEnforceStockLongitudinal",
