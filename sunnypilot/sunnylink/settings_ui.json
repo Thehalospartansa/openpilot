@@ -248,36 +248,6 @@
               ],
               "title": "Enforce Torque Lateral Control",
               "description": "Enable this to enforce sunnypilot to steer with Torque lateral control."
-            },
-            {
-              "key": "NeuralNetworkLateralControl",
-              "widget": "toggle",
-              "visibility": [
-                {
-                  "type": "not",
-                  "condition": {
-                    "type": "capability",
-                    "field": "steer_control_type",
-                    "equals": "angle"
-                  }
-                }
-              ],
-              "enablement": [
-                {
-                  "type": "offroad_only"
-                },
-                {
-                  "type": "capability",
-                  "field": "torque_allowed",
-                  "equals": true
-                },
-                {
-                  "type": "param",
-                  "key": "EnforceTorqueControl",
-                  "equals": false
-                }
-              ],
-              "title": "Neural Network Lateral Control (NNLC)"
             }
           ],
           "sub_panels": [
@@ -1932,6 +1902,44 @@
                   ]
                 }
               ]
+            }
+          ]
+        },
+        {
+          "id": "lateral_control",
+          "title": "Lateral Control",
+          "description": "Neural network lateral control for supported models",
+          "items": [
+            {
+              "key": "NeuralNetworkLateralControl",
+              "widget": "toggle",
+              "visibility": [
+                {
+                  "type": "not",
+                  "condition": {
+                    "type": "capability",
+                    "field": "steer_control_type",
+                    "equals": "angle"
+                  }
+                }
+              ],
+              "enablement": [
+                {
+                  "type": "offroad_only"
+                },
+                {
+                  "type": "capability",
+                  "field": "torque_allowed",
+                  "equals": true
+                },
+                {
+                  "type": "param",
+                  "key": "EnforceTorqueControl",
+                  "equals": false
+                }
+              ],
+              "title": "Neural Network Lateral Control (NNLC)",
+              "description": "Use a neural network for lateral control instead of the default torque controller."
             }
           ]
         },

@@ -197,8 +197,9 @@ def collect_all_items(data: dict) -> list[tuple[str, dict]]:
       for item in sp.get("items", []):
         _collect_item(f"panel '{pid}' > sub_panel '{spid}'", item, items)
 
-  # Vehicle settings
-  for brand, brand_items in data.get("vehicle_settings", {}).items():
+  # Vehicle settings (supports both flat list and { title, items } structure)
+  for brand, brand_data in data.get("vehicle_settings", {}).items():
+    brand_items = brand_data.get("items", []) if isinstance(brand_data, dict) else brand_data
     for item in brand_items:
       _collect_item(f"vehicle_settings '{brand}'", item, items)
 
@@ -335,7 +336,8 @@ def check_no_duplicate_keys(data: dict, result: ValidationResult) -> None:
       panel_keys.setdefault(key, []).append(pid)
 
   # Also check vehicle_settings keys don't collide with panel keys
-  for brand, brand_items in data.get("vehicle_settings", {}).items():
+  for brand, brand_data in data.get("vehicle_settings", {}).items():
+    brand_items = brand_data.get("items", []) if isinstance(brand_data, dict) else brand_data
     for item in brand_items:
       key = item.get("key")
       if key:
