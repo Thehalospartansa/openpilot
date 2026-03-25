@@ -243,8 +243,4 @@ EVENTS_SP: dict[int, dict[str, Alert | AlertCallbackType]] = {
       AlertStatus.normal, AlertSize.none,
       Priority.MID, VisualAlert.none, AudibleAlert.prompt, 3.),
   },
-
-  EventNameSP.remoteCyclePending: {
-    ET.PERMANENT: NormalPermanentAlert("Remote Settings Update Pending", "Disengage to Apply", duration=3.),
-  },
 }
