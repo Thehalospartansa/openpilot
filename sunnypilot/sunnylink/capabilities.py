@@ -36,7 +36,7 @@ CAPABILITY_LABELS: dict[str, str] = {
   "has_longitudinal_control": "sunnypilot longitudinal control",
   "has_icbm": "ICBM enabled",
   "icbm_available": "ICBM available",
-  "torque_allowed": "Torque lateral control",
+  "torque_allowed": "torque steering (not available for angle steering vehicles)",
   "brand": "Vehicle brand",
   "pcm_cruise": "PCM cruise",
   "alpha_long_available": "Alpha Longitudinal available",
