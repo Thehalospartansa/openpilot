@@ -1976,13 +1976,6 @@
         {
           "key": "HyundaiLongitudinalTuning",
           "widget": "multiple_button",
-          "visibility": [
-            {
-              "type": "capability",
-              "field": "alpha_long_available",
-              "equals": true
-            }
-          ],
           "enablement": [
             {
               "type": "offroad_only"
