@@ -57,6 +57,10 @@ def joystickd_thread():
       actuators.torque = float(np.clip(joystick_axes[1], -1, 1))
       actuators.steeringAngleDeg, actuators.curvature = actuators.torque * max_angle, actuators.torque * -max_curvature
 
+    if len(joystick_axes) > 2:
+      # axes[2] controls DAMP_FACTOR: [-1, 1] mapped to [3, 200]
+      actuators.dampFactor = float(np.interp(joystick_axes[2], [-1, 1], [3, 200]))
+
     pm.send('carControl', cc_msg)
 
     cs_msg = messaging.new_message('controlsState')
