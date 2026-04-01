@@ -185,7 +185,9 @@ def modeld_lagging_alert(CP: car.CarParams, CS: car.CarState, sm: messaging.SubM
 def joystick_alert(CP: car.CarParams, CS: car.CarState, sm: messaging.SubMaster, metric: bool, soft_disable_time: int, personality) -> Alert:
   gb = sm['carControl'].actuators.accel / 4.
   steer = sm['carControl'].actuators.torque
-  vals = f"Gas: {round(gb * 100.)}%, Steer: {round(steer * 100.)}%"
+  damp = sm['carControl'].actuators.dampFactor
+  damp_pct = round((damp - 3) / (200 - 3) * 100.) if damp > 0 else 50
+  vals = f"Gas: {round(gb * 100.)}%, Steer: {round(steer * 100.)}%\nDamp: {damp_pct}%"
   return NormalPermanentAlert("Joystick Mode", vals)
 
 
