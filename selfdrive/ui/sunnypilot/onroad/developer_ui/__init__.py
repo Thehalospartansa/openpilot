@@ -12,8 +12,7 @@ from openpilot.selfdrive.ui.sunnypilot.onroad.developer_ui.elements import (
   UiElement, RelDistElement, RelSpeedElement, SteeringAngleElement,
   DesiredLateralAccelElement, ActualLateralAccelElement, DesiredSteeringAngleElement,
   AEgoElement, LeadSpeedElement, FrictionCoefficientElement, LatAccelFactorElement,
-  SteeringTorqueEpsElement, BearingDegElement, AltitudeElement, DesiredSteeringPIDElement,
-  TorqueReductionGainElement,
+  SteeringTorqueEpsElement, BearingDegElement, AltitudeElement, DesiredSteeringPIDElement
 )
 from openpilot.system.ui.lib.application import gui_app, FontWeight
 from openpilot.system.ui.lib.text_measure import measure_text_cached
@@ -54,7 +53,6 @@ class DeveloperUiRenderer(Widget):
     self.steering_torque_elem = SteeringTorqueEpsElement()
     self.bearing_elem = BearingDegElement()
     self.altitude_elem = AltitudeElement()
-    self.torque_reduction_gain_elem = TorqueReductionGainElement()
 
   def _update_state(self) -> None:
     self.dev_ui_mode = ui_state.developer_ui
@@ -84,16 +82,14 @@ class DeveloperUiRenderer(Widget):
     x = int(rect.x + rect.width - container_width - UI_BORDER_SIZE * 2)
     y = int(rect.y + UI_BORDER_SIZE * 1.5)
 
-    is_angle_car = controls_state.lateralControlState.which() == 'angleState'
-
     elements = [
       self.rel_dist_elem.update(sm, ui_state.is_metric),
-      self.torque_reduction_gain_elem.update(sm, ui_state.is_metric) if is_angle_car else self.rel_speed_elem.update(sm, ui_state.is_metric),
+      self.rel_speed_elem.update(sm, ui_state.is_metric),
       self.steering_angle_elem.update(sm, ui_state.is_metric),
     ]
     if controls_state.lateralControlState.which() == 'torqueState':
       elements.append(self.desired_lat_accel_elem.update(sm, ui_state.is_metric))
-    elif is_angle_car:
+    elif controls_state.lateralControlState.which() == 'angleState':
       elements.append(self.desired_steer_elem.update(sm, ui_state.is_metric))
     elif controls_state.lateralControlState.which() == 'pidState':
       elements.append(self.desired_pid_steer_elem.update(sm, ui_state.is_metric))
