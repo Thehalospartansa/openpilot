@@ -35,6 +35,18 @@ void PandaSafety::updateMultiplexingMode() {
     prev_obd_multiplexing_ = obd_multiplexing_requested;
     params_.putBool("ObdMultiplexingChanged", true);
   }
+
+  // Switch to noOutput passthrough for bus detection (relay engaged, forwarding enabled, no TX)
+  bool bus_detection_requested = params_.getBool("BusDetectionEnabled");
+  if (bus_detection_requested != prev_bus_detection_) {
+    if (bus_detection_requested) {
+      panda_->set_safety_model(cereal::CarParams::SafetyModel::NO_OUTPUT_PASSTHROUGH);
+    } else {
+      panda_->set_safety_model(cereal::CarParams::SafetyModel::ELM327, 1U);
+    }
+    prev_bus_detection_ = bus_detection_requested;
+    params_.putBool("BusDetectionChanged", true);
+  }
 }
 
 std::string PandaSafety::fetchCarParams() {

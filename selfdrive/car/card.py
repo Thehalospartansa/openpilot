@@ -15,7 +15,7 @@ from opendbc.car import DT_CTRL, structs
 from opendbc.car.can_definitions import CanData, CanRecvCallable, CanSendCallable
 from opendbc.car.carlog import carlog
 from opendbc.car.fw_versions import ObdCallback
-from opendbc.car.car_helpers import get_car, interfaces
+from opendbc.car.car_helpers import get_car, interfaces, BusDetectionCallback
 from opendbc.car.interfaces import CarInterfaceBase, RadarInterfaceBase
 from openpilot.selfdrive.pandad import can_capnp_to_list, can_list_to_can_capnp
 from openpilot.selfdrive.car.cruise import VCruiseHelper
@@ -37,6 +37,17 @@ def obd_callback(params: Params) -> ObdCallback:
       params.get_bool("ObdMultiplexingChanged", block=True)
       cloudlog.warning("OBD multiplexing set successfully")
   return set_obd_multiplexing
+
+
+def bus_detection_callback(params: Params) -> BusDetectionCallback:
+  def set_bus_detection(enabled: bool):
+    if params.get_bool("BusDetectionEnabled") != enabled:
+      cloudlog.warning(f"Setting bus detection mode to {enabled}")
+      params.remove("BusDetectionChanged")
+      params.put_bool("BusDetectionEnabled", enabled)
+      params.get_bool("BusDetectionChanged", block=True)
+      cloudlog.warning("Bus detection mode set successfully")
+  return set_bus_detection
 
 
 def can_comm_callbacks(logcan: messaging.SubSocket, sendcan: messaging.PubSocket) -> tuple[CanRecvCallable, CanSendCallable]:
@@ -97,7 +108,8 @@ class Car:
         with car.CarParams.from_bytes(cached_params_raw) as _cached_params:
           cached_params = _cached_params
 
-      self.CI = get_car(*self.can_callbacks, obd_callback(self.params), alpha_long_allowed, is_release, cached_params)
+      self.CI = get_car(*self.can_callbacks, obd_callback(self.params), alpha_long_allowed, is_release, cached_params,
+                        set_bus_detection=bus_detection_callback(self.params))
       self.RI = interfaces[self.CI.CP.carFingerprint].RadarInterface(self.CI.CP)
       self.CP = self.CI.CP
 
