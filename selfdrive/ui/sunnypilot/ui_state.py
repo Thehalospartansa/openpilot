@@ -162,7 +162,7 @@ class DeviceSP:
         _ui_state.screensaver.deinit()
         return True
       else:
-        _ui_state.screensaver.initialize(dismiss_callback=lambda: self._set_awake(False))
+        _ui_state.screensaver.initialize(dismiss_callback=lambda: self._set_awake(False, _ui_state))
         gui_app.set_modal_overlay(_ui_state.screensaver)
         return False
 
