@@ -10,7 +10,6 @@ from cereal import log, custom
 from opendbc.car import structs
 from opendbc.car.hyundai.values import HyundaiFlags
 from openpilot.common.params import Params
-from openpilot.common.realtime import DT_CTRL
 from openpilot.sunnypilot.mads.helpers import MadsSteeringModeOnBrake, read_steering_mode_param, MADS_NO_ACC_MAIN_BUTTON
 from openpilot.sunnypilot.mads.state import StateMachine, GEARS_ALLOW_PAUSED_SILENT
 
@@ -199,19 +198,8 @@ class ModularAssistiveDrivingSystem:
       if self.state_machine.state == State.paused:
         self.events_sp.add(EventNameSP.silentLkasEnable)
 
-    # same conditions as stock controlsMismatch
-    for i, ps in enumerate(self.selfdrive.sm['pandaStates']):
-      # All pandas must match the list of safetyConfigs, and if outside this list, must be silent or noOutput
-      if i < len(self.CP.safetyConfigs):
-        safety_mismatch = ps.safetyModel != self.CP.safetyConfigs[i].safetyModel or \
-                          ps.safetyParam != self.CP.safetyConfigs[i].safetyParam or \
-                          ps.alternativeExperience != self.CP.alternativeExperience
-      else:
-        safety_mismatch = ps.safetyModel not in IGNORED_SAFETY_MODES
-
-      # safety mismatch allows some time for pandad to set the safety mode and publish it back from panda
-      if (safety_mismatch and self.selfdrive.sm.frame * DT_CTRL > 10.) or ps.safetyRxChecksInvalid or self.lateral_mismatch_counter >= 200:
-        self.events_sp.add(EventNameSP.controlsMismatchLateral)
+    if self.lateral_mismatch_counter >= 200:
+      self.events_sp.add(EventNameSP.controlsMismatchLateral)
 
     self.events.remove(EventName.pcmDisable)
     self.events.remove(EventName.buttonCancel)
