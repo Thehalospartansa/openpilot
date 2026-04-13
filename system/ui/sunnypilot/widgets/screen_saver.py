@@ -44,7 +44,7 @@ class ScreenSaverSP(Widget):
     self._dismiss = False
     self._start_time = None
 
-  def _handle_mouse_press(self, mouse_pos) -> bool:
+  def _handle_mouse_press(self, mouse_pos):
     self._reset()
     return super()._handle_mouse_press(mouse_pos)
 
