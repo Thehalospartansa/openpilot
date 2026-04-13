@@ -87,8 +87,12 @@ class ScreenSaverSP(Widget):
       self.y = 0
       hit_y = True
 
+    def hue_dist(a, b):
+      d = abs(a - b)
+      return min(d, 360 - d)
+
     if hit_x or hit_y:
-      while not abs((new_hue := rl.get_random_value(0, 360)) - self._hue) >= 50:
+      while hue_dist((new_hue := rl.get_random_value(0, 360)), self._hue) < 90:
         pass
       self._hue = new_hue
       self.color = rl.color_from_hsv(self._hue, 1, 1)

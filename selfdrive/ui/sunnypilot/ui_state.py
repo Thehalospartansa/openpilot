@@ -160,10 +160,11 @@ class DeviceSP:
     if not on and _ui_state.screensaver_enabled:
       if _ui_state.screensaver.was_dismissed:
         _ui_state.screensaver.deinit()
+        gui_app.pop_widget()
         return True
       else:
-        _ui_state.screensaver.initialize(dismiss_callback=lambda: self._set_awake(False, _ui_state))
-        gui_app.set_modal_overlay(_ui_state.screensaver)
+        _ui_state.screensaver.initialize(dismiss_callback=lambda: self._set_awake(False))
+        gui_app.push_widget(_ui_state.screensaver)
         return False
 
     return True
