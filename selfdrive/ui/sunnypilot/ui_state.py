@@ -153,7 +153,8 @@ class UIStateSP:
 
 
 class DeviceSP:
-  def _set_awake(self, on: bool, _ui_state):
+  @staticmethod
+  def _set_awake(_device, on: bool, _ui_state):
     if _ui_state.boot_offroad_mode == 1 and not on:
       _ui_state.params.put_bool("OffroadMode", True)
 
@@ -163,7 +164,7 @@ class DeviceSP:
         gui_app.pop_widget()
         return True
       else:
-        _ui_state.screensaver.initialize(dismiss_callback=lambda: self._set_awake(False))
+        _ui_state.screensaver.initialize(dismiss_callback=lambda: _device._set_awake(False))
         gui_app.push_widget(_ui_state.screensaver)
         return False
 
