@@ -10,6 +10,7 @@ from cereal import log, custom
 from opendbc.car import structs
 from opendbc.car.hyundai.values import HyundaiFlags
 from openpilot.common.params import Params
+from openpilot.common.realtime import DT_CTRL
 from openpilot.sunnypilot.mads.helpers import MadsSteeringModeOnBrake, read_steering_mode_param, MADS_NO_ACC_MAIN_BUTTON
 from openpilot.sunnypilot.mads.state import StateMachine, GEARS_ALLOW_PAUSED_SILENT
 
@@ -33,6 +34,7 @@ class ModularAssistiveDrivingSystem:
     self.enabled = False
     self.active = False
     self.available = False
+    self.lateral_mismatch_counter = 0
     self.allow_always = False
     self.no_main_cruise = False
     self.selfdrive = selfdrive
@@ -103,6 +105,17 @@ class ModularAssistiveDrivingSystem:
   def replace_event(self, old_event: int, new_event: int):
     self.events.remove(old_event)
     self.events_sp.add(new_event)
+
+  def data_sample(self):
+    # When the safety and selfdrived do not agree on controls_allowed_lateral
+    # we want to disengage sunnypilot. However the status from the panda goes through
+    # another socket other than the CAN messages and one can arrive earlier than the other.
+    # Therefore we allow a mismatch for two samples, then we trigger the disengagement.
+    if not self.active or self.selfdrive.enabled:
+      self.lateral_mismatch_counter = 0
+    elif any(not ps.controlsAllowedLateral for ps in self.selfdrive.sm['pandaStates']
+             if ps.safetyModel not in IGNORED_SAFETY_MODES):
+      self.lateral_mismatch_counter += 1
 
   def update_events(self, CS: structs.CarState):
     if not self.selfdrive.enabled and self.enabled:
@@ -186,6 +199,20 @@ class ModularAssistiveDrivingSystem:
       if self.state_machine.state == State.paused:
         self.events_sp.add(EventNameSP.silentLkasEnable)
 
+    # same conditions as stock controlsMismatch
+    for i, ps in enumerate(self.selfdrive.sm['pandaStates']):
+      # All pandas must match the list of safetyConfigs, and if outside this list, must be silent or noOutput
+      if i < len(self.CP.safetyConfigs):
+        safety_mismatch = ps.safetyModel != self.CP.safetyConfigs[i].safetyModel or \
+                          ps.safetyParam != self.CP.safetyConfigs[i].safetyParam or \
+                          ps.alternativeExperience != self.CP.alternativeExperience
+      else:
+        safety_mismatch = ps.safetyModel not in IGNORED_SAFETY_MODES
+
+      # safety mismatch allows some time for pandad to set the safety mode and publish it back from panda
+      if (safety_mismatch and self.selfdrive.sm.frame * DT_CTRL > 10.) or ps.safetyRxChecksInvalid or self.lateral_mismatch_counter >= 200:
+        self.events_sp.add(EventNameSP.controlsMismatchLateral)
+
     self.events.remove(EventName.pcmDisable)
     self.events.remove(EventName.buttonCancel)
     self.events.remove(EventName.pedalPressed)
@@ -194,6 +221,8 @@ class ModularAssistiveDrivingSystem:
   def update(self, CS: structs.CarState):
     if not self.enabled_toggle:
       return
+
+    self.data_sample()
 
     self.update_events(CS)
 
