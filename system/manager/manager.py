@@ -20,6 +20,9 @@ from openpilot.system.athena.registration import register, UNREGISTERED_DONGLE_I
 from openpilot.common.swaglog import cloudlog, add_file_handler
 from openpilot.system.version import get_build_metadata
 from openpilot.system.hardware.hw import Paths
+from openpilot.system.hardware import PC
+
+from openpilot.sunnypilot.system.params_migration import run_migration
 
 
 def manager_init() -> None:
@@ -35,8 +38,21 @@ def manager_init() -> None:
   if build_metadata.release_channel:
     params.clear_all(ParamKeyFlag.DEVELOPMENT_ONLY)
 
+  # device boot mode
+  if params.get("DeviceBootMode") == 1:  # start in Always Offroad mode
+    params.put_bool("OffroadMode", True)
+
+  # quick boot
+  if params.get_bool("QuickBootToggle") and not PC:
+    prebuilt_path = "/data/openpilot/prebuilt"
+    if not os.path.exists(prebuilt_path):
+      open(prebuilt_path, 'x').close()
+
   if params.get_bool("RecordFrontLock"):
     params.put_bool("RecordFront", True)
+
+  if not PC:
+    run_migration(params)
 
   # set unset params to their default value
   for k in params.all_keys():
@@ -59,8 +75,10 @@ def manager_init() -> None:
   params.put("GitCommitDate", build_metadata.openpilot.git_commit_date)
   params.put("GitBranch", build_metadata.channel)
   params.put("GitRemote", build_metadata.openpilot.git_origin)
+  params.put_bool("IsDevelopmentBranch", build_metadata.development_channel)
   params.put_bool("IsTestedBranch", build_metadata.tested_channel)
   params.put_bool("IsReleaseBranch", build_metadata.release_channel)
+  params.put_bool("IsReleaseSpBranch", build_metadata.release_sp_channel)
   params.put("HardwareSerial", serial)
 
   # set dongle id

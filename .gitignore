@@ -86,3 +86,10 @@ build/
 .context/
 PLAN.md
 TASK.md
+CLAUDE.md
+SKILL.md
+
+### JetBrains ###
+!.idea/customTargets.xml
+!.idea/tools/*
+!.run/*

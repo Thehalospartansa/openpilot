@@ -39,8 +39,8 @@ _services: dict[str, tuple] = {
   "roadEncodeIdx": (False, 20., 1),
   "liveTracks": (True, 20.),
   "sendcan": (True, 100., 139, QueueSize.MEDIUM),
-  "logMessage": (True, 0.),
-  "errorLogMessage": (True, 0., 1),
+  "logMessage": (True, 0., None, QueueSize.BIG),
+  "errorLogMessage": (True, 0., 1, QueueSize.BIG),
   "liveCalibration": (True, 4., 4),
   "liveTorqueParameters": (True, 4., 1),
   "liveDelay": (True, 4., 1),
@@ -89,6 +89,19 @@ _services: dict[str, tuple] = {
   "driverEncodeData": (False, 20., None, QueueSize.BIG),
   "wideRoadEncodeData": (False, 20., None, QueueSize.BIG),
   "qRoadEncodeData": (False, 20., None, QueueSize.BIG),
+
+  # sunnypilot
+  "modelManagerSP": (False, 1., 1, QueueSize.BIG),
+  "backupManagerSP": (False, 1., 1, QueueSize.BIG),
+  "selfdriveStateSP": (True, 100., 10),
+  "longitudinalPlanSP": (True, 20., 10),
+  "onroadEventsSP": (True, 1., 1),
+  "carParamsSP": (True, 0.02, 1),
+  "carControlSP": (True, 100., 10),
+  "carStateSP": (True, 100., 10),
+  "liveMapDataSP": (True, 1., 1),
+  "modelDataV2SP": (True, 20., None, QueueSize.BIG),
+  "liveLocationKalman": (True, 20.),
 
   # debug
   "uiDebug": (True, 0., 1),

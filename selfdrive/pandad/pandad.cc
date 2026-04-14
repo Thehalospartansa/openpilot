@@ -31,6 +31,11 @@ bool check_connected(Panda *panda) {
   return true;
 }
 
+bool process_mads_heartbeat(SubMaster *sm) {
+  const auto &mads = (*sm)["selfdriveStateSP"].getSelfdriveStateSP().getMads();
+  return sm->allAliveAndValid({"selfdriveStateSP"}) && mads.getEnabled();
+}
+
 Panda *connect(std::string serial) {
   std::unique_ptr<Panda> panda;
   try {
@@ -47,6 +52,13 @@ Panda *connect(std::string serial) {
 
   for (int i = 0; i < PANDA_CAN_CNT; i++) {
     panda->set_can_fd_auto(i, true);
+  }
+
+  bool is_supported_panda = std::find(SUPPORTED_PANDA_TYPES.begin(), SUPPORTED_PANDA_TYPES.end(), panda->hw_type) != SUPPORTED_PANDA_TYPES.end();
+
+  if (!is_supported_panda) {
+    LOGW("panda %s is not supported (hw_type: %i), skipping firmware check...", panda->hw_serial().c_str(), static_cast<uint16_t>(panda->hw_type));
+    return panda.release();
   }
 
   if (!panda->up_to_date() && !getenv("BOARDD_SKIP_FW_CHECK")) {
@@ -131,6 +143,8 @@ void fill_panda_state(cereal::PandaState::Builder &ps, cereal::PandaState::Panda
   ps.setSbu1Voltage(health.sbu1_voltage_mV / 1000.0f);
   ps.setSbu2Voltage(health.sbu2_voltage_mV / 1000.0f);
   ps.setSoundOutputLevel(health.sound_output_level_pkt);
+  ps.setControlsAllowedLateral(health.controls_allowed_lateral_pkt);
+  ps.setControlsAllowedLongitudinal(health.controls_allowed_longitudinal_pkt);
 }
 
 void fill_panda_can_state(cereal::PandaState::PandaCanState::Builder &cs, const can_health_t &can_health) {
@@ -161,7 +175,7 @@ void fill_panda_can_state(cereal::PandaState::PandaCanState::Builder &cs, const 
   cs.setCanCoreResetCnt(can_health.can_core_reset_cnt);
 }
 
-std::optional<bool> send_panda_states(PubMaster *pm, Panda *panda, bool is_onroad, bool spoofing_started) {
+std::optional<bool> send_panda_states(PubMaster *pm, Panda *panda, bool is_onroad, bool spoofing_started, bool always_offroad) {
   // build msg
   MessageBuilder msg;
   auto evt = msg.initEvent();
@@ -187,7 +201,7 @@ std::optional<bool> send_panda_states(PubMaster *pm, Panda *panda, bool is_onroa
     health.ignition_line_pkt = 1;
   }
 
-  bool ignition_local = ((health.ignition_line_pkt != 0) || (health.ignition_can_pkt != 0));
+  bool ignition_local = ((health.ignition_line_pkt != 0) || (health.ignition_can_pkt != 0)) && !always_offroad;
 
   // Make sure CAN buses are live: safety_setter_thread does not work if Panda CAN are silent and there is only one other CAN node
   if (health.safety_mode_pkt == (uint8_t)(cereal::CarParams::SafetyModel::SILENT)) {
@@ -267,8 +281,8 @@ void send_peripheral_state(Panda *panda, PubMaster *pm) {
   pm->send("peripheralState", msg);
 }
 
-void process_panda_state(Panda *panda, PubMaster *pm, bool engaged, bool is_onroad, bool spoofing_started) {
-  auto ignition_opt = send_panda_states(pm, panda, is_onroad, spoofing_started);
+void process_panda_state(Panda *panda, PubMaster *pm, bool engaged, bool engaged_mads, bool is_onroad, bool spoofing_started, bool always_offroad) {
+  auto ignition_opt = send_panda_states(pm, panda, is_onroad, spoofing_started, always_offroad);
   if (!ignition_opt) {
     LOGE("Failed to get ignition_opt");
     return;
@@ -282,7 +296,7 @@ void process_panda_state(Panda *panda, PubMaster *pm, bool engaged, bool is_onro
     }
   }
 
-  panda->send_heartbeat(engaged);
+  panda->send_heartbeat(engaged, engaged_mads);
 }
 
 void process_peripheral_state(Panda *panda, PubMaster *pm, bool no_fan_control) {
@@ -341,9 +355,9 @@ void process_peripheral_state(Panda *panda, PubMaster *pm, bool no_fan_control) 
     }
 
     if (ir_pwr != prev_ir_pwr || sm.frame % 100 == 0) {
-      int16_t ir_panda = util::map_val(ir_pwr, 0, 100, 0, MAX_IR_PANDA_VAL); 
+      int16_t ir_panda = util::map_val(ir_pwr, 0, 100, 0, MAX_IR_PANDA_VAL);
       panda->set_ir_pwr(ir_panda);
-      Hardware::set_ir_power(ir_pwr); 
+      Hardware::set_ir_power(ir_pwr);
       prev_ir_pwr = ir_pwr;
     }
   }
@@ -359,11 +373,13 @@ void pandad_run(Panda *panda) {
 
   Params params;
   RateKeeper rk("pandad", 100);
-  SubMaster sm({"selfdriveState"});
+  SubMaster sm({"selfdriveState", "selfdriveStateSP"});
   PubMaster pm({"can", "pandaStates", "peripheralState"});
   PandaSafety panda_safety(panda);
   bool engaged = false;
+  bool engaged_mads = false;
   bool is_onroad = false;
+  bool always_offroad = false;
 
   // Main loop: receive CAN data and process states
   while (!do_exit && check_connected(panda)) {
@@ -378,8 +394,10 @@ void pandad_run(Panda *panda) {
     if (rk.frame() % 10 == 0) {
       sm.update(0);
       engaged = sm.allAliveAndValid({"selfdriveState"}) && sm["selfdriveState"].getSelfdriveState().getEnabled();
+      engaged_mads = process_mads_heartbeat(&sm);
       is_onroad = params.getBool("IsOnroad");
-      process_panda_state(panda, &pm, engaged, is_onroad, spoofing_started);
+      always_offroad = panda_safety.getOffroadMode();
+      process_panda_state(panda, &pm, engaged, engaged_mads, is_onroad, spoofing_started, always_offroad);
       panda_safety.configureSafetyMode(is_onroad);
     }
 

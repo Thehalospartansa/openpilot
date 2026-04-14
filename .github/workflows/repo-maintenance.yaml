@@ -12,7 +12,7 @@ jobs:
   package_updates:
     name: package_updates
     runs-on: ubuntu-latest
-    if: github.repository == 'commaai/openpilot'
+    if: github.repository == 'sunnypilot/sunnypilot'
     steps:
     - uses: actions/checkout@v6
       with:
@@ -42,6 +42,10 @@ jobs:
         echo 'EOF' >> $GITHUB_OUTPUT
     - name: bump submodules
       run: |
+        git config submodule.msgq.update none
+        git config submodule.rednose_repo.update none
+        git config submodule.teleoprtc_repo.update none
+        git config submodule.tinygrad.update none
         git submodule update --remote
         git add .
     - name: update car docs
@@ -51,8 +55,8 @@ jobs:
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0
       with:
-        author: Vehicle Researcher <user@comma.ai>
-        token: ${{ secrets.ACTIONS_CREATE_PR_PAT }}
+        author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+        token: ${{ github.repository == 'commaai/openpilot' && secrets.ACTIONS_CREATE_PR_PAT || secrets.GITHUB_TOKEN }}
         commit-message: Update Python packages
         title: '[bot] Update Python packages'
         branch: auto-package-updates

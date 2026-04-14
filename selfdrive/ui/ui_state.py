@@ -12,6 +12,8 @@ from openpilot.selfdrive.ui.lib.prime_state import PrimeState
 from openpilot.system.ui.lib.application import gui_app
 from openpilot.system.hardware import HARDWARE, PC
 
+from openpilot.selfdrive.ui.sunnypilot.ui_state import UIStateSP, DeviceSP
+
 BACKLIGHT_OFFROAD = 65 if HARDWARE.get_device_type() == "mici" else 50
 
 
@@ -19,9 +21,11 @@ class UIStatus(Enum):
   DISENGAGED = "disengaged"
   ENGAGED = "engaged"
   OVERRIDE = "override"
+  LAT_ONLY = "lat_only"
+  LONG_ONLY = "long_only"
 
 
-class UIState:
+class UIState(UIStateSP):
   _instance: 'UIState | None' = None
 
   def __new__(cls):
@@ -31,6 +35,7 @@ class UIState:
     return cls._instance
 
   def _initialize(self):
+    UIStateSP.__init__(self)
     self.params = Params()
     self.sm = messaging.SubMaster(
       [
@@ -55,7 +60,7 @@ class UIState:
         "carControl",
         "liveParameters",
         "rawAudioData",
-      ]
+      ] + self.sm_services_ext
     )
 
     self.prime_state = PrimeState()
@@ -95,7 +100,7 @@ class UIState:
 
   @property
   def engaged(self) -> bool:
-    return self.started and self.sm["selfdriveState"].enabled
+    return self.started and (self.sm["selfdriveState"].enabled or self.sm["selfdriveStateSP"].mads.enabled)
 
   def is_onroad(self) -> bool:
     return self.started
@@ -111,6 +116,7 @@ class UIState:
     if time.monotonic() - self._param_update_time > 5.0:
       self.update_params()
     device.update()
+    UIStateSP.update(self)
 
   def _update_state(self) -> None:
     # Handle panda states updates
@@ -152,6 +158,8 @@ class UIState:
       else:
         self.status = UIStatus.ENGAGED if ss.enabled else UIStatus.DISENGAGED
 
+      self.status = UIStatus(UIStateSP.update_status(ss, self.sm["selfdriveStateSP"], self.sm["onroadEvents"]))
+
     # Check for engagement state changes
     if self.engaged != self._engaged_prev:
       for callback in self._engaged_transition_callbacks:
@@ -180,11 +188,13 @@ class UIState:
         self.has_longitudinal_control = self.params.get_bool("AlphaLongitudinalEnabled")
       else:
         self.has_longitudinal_control = self.CP.openpilotLongitudinalControl
+    UIStateSP.update_params(self)
     self._param_update_time = time.monotonic()
 
 
-class Device:
+class Device(DeviceSP):
   def __init__(self):
+    DeviceSP.__init__(self)
     self._ignition = False
     self._interaction_time: float = -1
     self._override_interactive_timeout: int | None = None
@@ -210,6 +220,9 @@ class Device:
   def interactive_timeout(self) -> int:
     if self._override_interactive_timeout is not None:
       return self._override_interactive_timeout
+
+    if gui_app.sunnypilot_ui() and ui_state.custom_interactive_timeout != 0:
+      return ui_state.custom_interactive_timeout
 
     ignition_timeout = 10 if gui_app.big_ui() else 5
     return ignition_timeout if ui_state.ignition else 30
@@ -245,9 +258,17 @@ class Device:
       else:
         clipped_brightness = ((clipped_brightness + 16.0) / 116.0) ** 3.0
 
-      clipped_brightness = float(np.interp(clipped_brightness, [0, 1], [30, 100]))
+      min_brightness = 30
+      if gui_app.sunnypilot_ui():
+        min_brightness = DeviceSP.set_min_onroad_brightness(ui_state, min_brightness)
+
+      clipped_brightness = float(np.interp(clipped_brightness, [0, 1], [min_brightness, 100]))
 
     brightness = round(self._brightness_filter.update(clipped_brightness))
+
+    if gui_app.sunnypilot_ui():
+      brightness = DeviceSP.set_onroad_brightness(ui_state, self._awake, brightness)
+
     if not self._awake:
       brightness = 0
 
@@ -263,6 +284,9 @@ class Device:
     self._ignition = ui_state.ignition
 
     if ignition_just_turned_off or any(ev.left_down for ev in gui_app.mouse_events):
+      if gui_app.sunnypilot_ui():
+        DeviceSP.wake_from_dimmed_onroad_brightness(ui_state, gui_app.mouse_events)
+
       self._reset_interactive_timeout()
 
     interaction_timeout = time.monotonic() > self._interaction_time
@@ -275,6 +299,7 @@ class Device:
 
   def _set_awake(self, on: bool):
     if on != self._awake:
+      DeviceSP._set_awake(on, ui_state)
       self._awake = on
       cloudlog.debug(f"setting display power {int(on)}")
       HARDWARE.set_display_power(on)

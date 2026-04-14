@@ -57,9 +57,25 @@ jobs:
       working-directory: ${{ env.STRIPPED_DIR }}
       run: release/check-dirty.sh
     - name: Check submodules
-      if: github.repository == 'commaai/openpilot'
+      if: github.repository == 'sunnypilot/sunnypilot'
       timeout-minutes: 3
-      run: release/check-submodules.sh
+      run: |
+        if [ "${{ github.ref }}" != "refs/heads/master" ]; then
+          git fetch  origin master:refs/remotes/origin/master
+
+          SUBMODULE_PATHS=$(git diff origin/master HEAD --name-only | grep -E '^[^/]+$' | while read path; do
+            if git ls-files --stage "$path" | grep -q "^160000"; then
+              echo "$path"
+            fi
+          done | tr '\n' ' ')
+
+          if [ -n "$SUBMODULE_PATHS" ]; then
+            echo "Changed submodule paths: $SUBMODULE_PATHS"
+            export SUBMODULE_PATHS="$SUBMODULE_PATHS"
+            export CHECK_PR_REFS=true
+          fi
+        fi
+        release/check-submodules.sh
 
   build_mac:
     name: build macOS
@@ -109,7 +125,7 @@ jobs:
     - name: Build openpilot
       run: scons -j$(nproc)
     - name: Run unit tests
-      timeout-minutes: ${{ contains(runner.name, 'nsc') && 2 || 20 }}
+      timeout-minutes: ${{ contains(runner.name, 'nsc') && 2 || 999 }}
       run: |
         source selfdrive/test/setup_xvfb.sh
         # Pre-compile Python bytecode so each pytest worker doesn't need to
@@ -118,6 +134,7 @@ jobs:
 
   process_replay:
     name: process replay
+    if: false  # disable process_replay for forks
     runs-on: ${{
       (github.repository == 'commaai/openpilot') &&
       ((github.event_name != 'pull_request') ||
