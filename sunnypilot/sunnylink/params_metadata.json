@@ -1227,6 +1227,41 @@
     "max": 30,
     "step": 1
   },
+  "SpeedLimitUpshiftAccept": {
+    "title": "Speed Limit Cap Upshift",
+    "description": "Mode for accepting new speed limit changes in cap mode.",
+    "options": [
+      {
+        "value": 0,
+        "label": "Never Raise"
+      },
+      {
+        "value": 1,
+        "label": "Accel Pedal Confirm"
+      }
+    ]
+  },
+  "SpeedLimitMinCapFloor": {
+    "title": "Speed Limit Cap Floor",
+    "description": "Minimum speed below which speed limit capping is paused.",
+    "min": 0,
+    "max": 40,
+    "step": 1
+  },
+  "SpeedLimitCapAudioCue": {
+    "title": "Speed Limit Cap Audio Cue",
+    "description": "Enable audio cue when entering speed limit capping mode.",
+    "options": [
+      {
+        "value": 0,
+        "label": "Off"
+      },
+      {
+        "value": 1,
+        "label": "On"
+      }
+    ]
+  },
   "SshEnabled": {
     "title": "Enable SSH",
     "description": ""

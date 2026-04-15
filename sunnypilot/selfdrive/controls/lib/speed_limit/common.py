@@ -27,3 +27,8 @@ class Mode(IntEnumBase):
   information = 1
   warning = 2
   assist = 3
+
+
+class UpshiftAccept(IntEnumBase):
+  neverRaise = 0
+  accelPedal = 1

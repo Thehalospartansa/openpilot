@@ -21,6 +21,8 @@ from openpilot.system.ui.widgets.scroller_tici import Scroller
 
 SPEED_LIMIT_MODE_BUTTONS = [tr("Off"), tr("Info"), tr("Warning"), tr("Assist")]
 SPEED_LIMIT_OFFSET_TYPE_BUTTONS = [tr("None"), tr("Fixed"), tr("%")]
+SPEED_LIMIT_UPSHIFT_ACCEPT_BUTTONS = [tr("Never Raise"), tr("Accel Pedal Confirm")]
+SPEED_LIMIT_CAP_AUDIO_CUE_BUTTONS = [tr("Off"), tr("On")]
 
 SPEED_LIMIT_MODE_DESCRIPTIONS = [
   tr("Off: Disables the Speed Limit functions."),
@@ -33,6 +35,16 @@ SPEED_LIMIT_OFFSET_DESCRIPTIONS = [
   tr("None: No Offset"),
   tr("Fixed: Adds a fixed offset [Speed Limit + Offset]"),
   tr("Percent: Adds a percent offset [Speed Limit + (Offset % Speed Limit)]"),
+]
+
+SPEED_LIMIT_UPSHIFT_ACCEPT_DESCRIPTIONS = [
+  tr("Never Raise: Keeps the current cap when the speed limit changes."),
+  tr("Accel Pedal Confirm: Accepts new speed limit cap when you release the accelerator pedal."),
+]
+
+SPEED_LIMIT_CAP_AUDIO_CUE_DESCRIPTIONS = [
+  tr("Off: No audio cue when entering speed limit capping mode."),
+  tr("On: Plays a low chime when entering speed limit capping mode."),
 ]
 
 
@@ -86,13 +98,42 @@ class SpeedLimitSettingsLayout(Widget):
       label_callback=self._get_offset_label,
     )
 
+    self._speed_limit_upshift_accept = multiple_button_item_sp(
+      title=lambda: tr("Speed Limit Cap Upshift"),
+      description=self._get_upshift_accept_description,
+      buttons=SPEED_LIMIT_UPSHIFT_ACCEPT_BUTTONS,
+      param="SpeedLimitUpshiftAccept",
+      button_width=500,
+    )
+
+    self._speed_limit_min_cap_floor = option_item_sp(
+      title=lambda: tr("Speed Limit Cap Floor"),
+      param="SpeedLimitMinCapFloor",
+      min_value=0,
+      max_value=40,
+      description=self._get_min_cap_floor_description,
+      label_callback=self._get_min_cap_floor_label,
+    )
+
+    self._speed_limit_cap_audio_cue = multiple_button_item_sp(
+      title=lambda: tr("Speed Limit Cap Audio Cue"),
+      description=self._get_cap_audio_cue_description,
+      buttons=SPEED_LIMIT_CAP_AUDIO_CUE_BUTTONS,
+      param="SpeedLimitCapAudioCue",
+      button_width=450,
+    )
+
     items = [
       self._speed_limit_mode,
       LineSeparatorSP(40),
       self._source_button,
       LineSeparatorSP(40),
       self._speed_limit_offset_type,
-      self._speed_limit_value_offset
+      self._speed_limit_value_offset,
+      LineSeparatorSP(40),
+      self._speed_limit_upshift_accept,
+      self._speed_limit_min_cap_floor,
+      self._speed_limit_cap_audio_cue,
     ]
     return items
 
@@ -120,6 +161,23 @@ class SpeedLimitSettingsLayout(Widget):
       return f"{value} {unit}"
     return str(value)
 
+  @staticmethod
+  def _get_upshift_accept_description():
+    return get_highlighted_description(ui_state.params, "SpeedLimitUpshiftAccept", SPEED_LIMIT_UPSHIFT_ACCEPT_DESCRIPTIONS)
+
+  @staticmethod
+  def _get_min_cap_floor_description():
+    return ""
+
+  @staticmethod
+  def _get_min_cap_floor_label(value):
+    unit = tr("km/h") if ui_state.is_metric else tr("mph")
+    return f"{value} {unit}"
+
+  @staticmethod
+  def _get_cap_audio_cue_description():
+    return get_highlighted_description(ui_state.params, "SpeedLimitCapAudioCue", SPEED_LIMIT_CAP_AUDIO_CUE_DESCRIPTIONS)
+
   def _update_state(self):
     super()._update_state()
 
@@ -128,6 +186,7 @@ class SpeedLimitSettingsLayout(Widget):
       brand = ui_state.CP.brand
       has_long = ui_state.has_longitudinal_control
       has_icbm = ui_state.has_icbm
+      pcm_op_long = ui_state.CP.openpilotLongitudinalControl and ui_state.CP.pcmCruise
 
       """
           Speed Limit Assist is available when:
@@ -144,6 +203,7 @@ class SpeedLimitSettingsLayout(Widget):
 
     else:
       sla_available = False
+      pcm_op_long = False
 
     if not sla_available:
       self._speed_limit_mode.action_item.set_enabled_buttons({
@@ -156,6 +216,10 @@ class SpeedLimitSettingsLayout(Widget):
 
     offset_type = ui_state.params.get("SpeedLimitOffsetType", return_default=True)
     self._speed_limit_value_offset.set_visible(offset_type != int(SpeedLimitOffsetType.off))
+
+    self._speed_limit_upshift_accept.set_visible(pcm_op_long)
+    self._speed_limit_min_cap_floor.set_visible(pcm_op_long)
+    self._speed_limit_cap_audio_cue.set_visible(pcm_op_long)
 
   def _render(self, rect):
     if self._current_panel == PanelType.POLICY:

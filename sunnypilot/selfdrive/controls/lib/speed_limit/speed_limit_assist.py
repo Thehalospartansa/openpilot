@@ -15,8 +15,9 @@ from openpilot.selfdrive.modeld.constants import ModelConstants
 from openpilot.sunnypilot import PARAMS_UPDATE_PERIOD
 from openpilot.sunnypilot.selfdrive.selfdrived.events import EventsSP
 from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit import PCM_LONG_REQUIRED_MAX_SET_SPEED, CONFIRM_SPEED_THRESHOLD
-from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit.common import Mode
-from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit.helpers import compare_cluster_target, set_speed_limit_assist_availability
+from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit.common import Mode, UpshiftAccept
+from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit.helpers import compare_cluster_target, set_speed_limit_assist_availability, \
+  get_min_cap_floor, get_upshift_accept, get_cap_audio_cue_enabled
 
 ButtonType = car.CarState.ButtonEvent.Type
 EventNameSP = custom.OnroadEventSP.EventName
@@ -25,6 +26,8 @@ SpeedLimitSource = custom.LongitudinalPlanSP.SpeedLimit.Source
 
 ACTIVE_STATES = (SpeedLimitAssistState.active, SpeedLimitAssistState.adapting)
 ENABLED_STATES = (SpeedLimitAssistState.preActive, SpeedLimitAssistState.pending, *ACTIVE_STATES)
+CAP_ACTIVE_STATES = (SpeedLimitAssistState.capping,)
+CAP_ENABLED_STATES = CAP_ACTIVE_STATES  # cap mode has no partially-engaged state
 
 DISABLED_GUARD_PERIOD = 0.5  # secs.
 # secs. Time to wait after activation before considering temp deactivation signal.
@@ -33,6 +36,8 @@ PRE_ACTIVE_GUARD_PERIOD = {
   False: 5,
 }
 SPEED_LIMIT_CHANGED_HOLD_PERIOD = 1  # secs. Time to wait after speed limit change before switching to preActive.
+CAP_RAISE_HOLD_PERIOD = 0.2  # secs. Time to confirm limit raise before upshifting.
+CAP_SUSPEND_GUARD_PERIOD = 1.0  # secs. Time to hold cap disabled after long_override release.
 
 LIMIT_MIN_ACC = -1.5  # m/s^2 Maximum deceleration allowed for limit controllers to provide.
 LIMIT_MAX_ACC = 1.0   # m/s^2 Maximum acceleration allowed for limit controllers to provide while active.
@@ -64,6 +69,7 @@ class SpeedLimitAssist:
     self.enabled = self.params.get("SpeedLimitMode", return_default=True) == Mode.assist
     self.long_enabled = False
     self.long_enabled_prev = False
+    self.long_override = False
     self.is_enabled = False
     self.is_active = False
     self.output_v_target = V_CRUISE_UNSET
@@ -92,8 +98,20 @@ class SpeedLimitAssist:
     self._minus_hold = 0.
     self._last_carstate_ts = 0.
 
+    self._cap_change_timer = 0
+    self._cap_suspended_timer = 0
+    self._cap_below_floor = False
+    self._target_cap = 0.0
+    self._cap_upshift_pressed = False
+    self._cap_upshift_release_timer = 0
+    self._cap_audio_cue_fired = False
+    self._cap_raise_accepted = False
+    self._accel_pressed = False
+    self._min_cap_floor = get_min_cap_floor(self.params, self.is_metric)
+    self._cap_upshift_accept = get_upshift_accept(self.params)
+    self._cap_audio_cue_enabled = get_cap_audio_cue_enabled(self.params)
+
     # TODO-SP: SLA's own output_a_target for planner
-    # Solution functions mapped to respective states
     self.acceleration_solutions = {
       SpeedLimitAssistState.disabled: self.get_current_acceleration_as_target,
       SpeedLimitAssistState.inactive: self.get_current_acceleration_as_target,
@@ -101,6 +119,7 @@ class SpeedLimitAssist:
       SpeedLimitAssistState.pending: self.get_current_acceleration_as_target,
       SpeedLimitAssistState.adapting: self.get_adapting_state_target_acceleration,
       SpeedLimitAssistState.active: self.get_active_state_target_acceleration,
+      SpeedLimitAssistState.capping: self.get_current_acceleration_as_target,
     }
 
   @property
@@ -126,13 +145,13 @@ class SpeedLimitAssist:
       events_sp.add(EventNameSP.speedLimitActive)
 
   def get_v_target_from_control(self) -> float:
-    if self._has_speed_limit:
-      if self.pcm_op_long and self.is_enabled:
-        return self._speed_limit_final_last
-      if not self.pcm_op_long and self.is_active:
+    if self.pcm_op_long:
+      if self.state == SpeedLimitAssistState.capping:
+        return min(self.v_cruise_cluster, self._target_cap)
+    else:
+      if self._has_speed_limit and self.is_active:
         return self._speed_limit_final_last
 
-    # Fallback
     return V_CRUISE_UNSET
 
   # TODO-SP: SLA's own output_a_target for planner
@@ -144,6 +163,10 @@ class SpeedLimitAssist:
       self.is_metric = self.params.get_bool("IsMetric")
       set_speed_limit_assist_availability(self.CP, self.CP_SP, self.params)
       self.enabled = self.params.get("SpeedLimitMode", return_default=True) == Mode.assist
+      self._min_cap_floor = get_min_cap_floor(self.params, self.is_metric)
+    # Read every frame so settings changes take effect immediately without waiting on PARAMS_UPDATE_PERIOD
+    self._cap_upshift_accept = get_upshift_accept(self.params)
+    self._cap_audio_cue_enabled = get_cap_audio_cue_enabled(self.params)
 
   def update_car_state(self, CS: car.CarState) -> None:
     now = time.monotonic()
@@ -187,7 +210,12 @@ class SpeedLimitAssist:
                             cst_high
     pcm_long_required_max_set_speed_conv = round(pcm_long_required_max * speed_conv)
 
-    self.target_set_speed_conv = pcm_long_required_max_set_speed_conv if self.pcm_op_long else self.speed_limit_final_last_conv
+    if self.pcm_op_long and self.state not in CAP_ACTIVE_STATES:
+      self.target_set_speed_conv = pcm_long_required_max_set_speed_conv
+    elif not self.pcm_op_long:
+      self.target_set_speed_conv = self.speed_limit_final_last_conv
+    else:
+      self.target_set_speed_conv = self.v_cruise_cluster_conv
 
   @property
   def apply_confirm_speed_threshold(self) -> bool:
@@ -232,74 +260,99 @@ class SpeedLimitAssist:
 
     return self._get_button_release(req_plus, req_minus)
 
-  def update_state_machine_pcm_op_long(self):
-    self.long_engaged_timer = max(0, self.long_engaged_timer - 1)
-    self.pre_active_timer = max(0, self.pre_active_timer - 1)
+  def _cap_limit_change_held(self) -> bool:
+    """Return True when limit-change hold period has elapsed."""
+    return self._cap_change_timer >= int(SPEED_LIMIT_CHANGED_HOLD_PERIOD / DT_MDL)
 
-    # ACTIVE, ADAPTING, PENDING, PRE_ACTIVE, INACTIVE
+  def _cap_upshift_release_edge(self) -> bool:
+    """Return True when limit-raise hold period elapsed after gas release edge."""
+    if self._cap_upshift_pressed and not self._accel_pressed:
+      self._cap_upshift_release_timer = int(CAP_RAISE_HOLD_PERIOD / DT_MDL)
+
+    self._cap_upshift_pressed = self._accel_pressed
+
+    if self._cap_upshift_release_timer > 0:
+      self._cap_upshift_release_timer = max(0, self._cap_upshift_release_timer - 1)
+      if self._cap_upshift_release_timer <= 0:
+        return True
+
+    return False
+
+  def update_state_machine_cap(self, events_sp: EventsSP) -> tuple[bool, bool]:
+    """Cap mode FSM for pcm_op_long cars. Returns (enabled, active)."""
+    self._cap_change_timer = min(self._cap_change_timer + 1,
+                                 int((SPEED_LIMIT_CHANGED_HOLD_PERIOD + 1) / DT_MDL))
+    self._cap_suspended_timer = max(0, self._cap_suspended_timer - 1)
+    self._cap_upshift_release_timer = max(0, self._cap_upshift_release_timer - 1)
+
+    self._cap_below_floor = self._has_speed_limit and self._speed_limit_final_last < self._min_cap_floor
+
+    # CAPPING, PENDING, DISABLED
     if self.state != SpeedLimitAssistState.disabled:
       if not self.long_enabled or not self.enabled:
+        self._cap_raise_accepted = False
         self.state = SpeedLimitAssistState.disabled
+      elif self.long_override:
+        self._cap_raise_accepted = False
+        self.state = SpeedLimitAssistState.disabled
+        self._cap_suspended_timer = int(CAP_SUSPEND_GUARD_PERIOD / DT_MDL)
 
       else:
-        # ACTIVE
-        if self.state == SpeedLimitAssistState.active:
-          if self.v_cruise_cluster_changed:
-            self.state = SpeedLimitAssistState.inactive
-          elif self.speed_limit_changed and self.apply_confirm_speed_threshold:
-            self.state = SpeedLimitAssistState.preActive
-            self.pre_active_timer = int(PRE_ACTIVE_GUARD_PERIOD[self.pcm_op_long] / DT_MDL)
-          elif self._has_speed_limit and self.v_offset < LIMIT_SPEED_OFFSET_TH:
-            self.state = SpeedLimitAssistState.adapting
-
-        # ADAPTING
-        elif self.state == SpeedLimitAssistState.adapting:
-          if self.v_cruise_cluster_changed:
-            self.state = SpeedLimitAssistState.inactive
-          elif self.speed_limit_changed and self.apply_confirm_speed_threshold:
-            self.state = SpeedLimitAssistState.preActive
-            self.pre_active_timer = int(PRE_ACTIVE_GUARD_PERIOD[self.pcm_op_long] / DT_MDL)
-          elif self.v_offset >= LIMIT_SPEED_OFFSET_TH:
-            self.state = SpeedLimitAssistState.active
+        # CAPPING
+        if self.state == SpeedLimitAssistState.capping:
+          if not self._has_speed_limit:
+            self._cap_raise_accepted = False
+            self.state = SpeedLimitAssistState.pending
+          elif self._cap_below_floor:
+            self._cap_raise_accepted = False
+            self.state = SpeedLimitAssistState.pending
+          elif self._speed_limit_final_last != self._target_cap and self._cap_limit_change_held():
+            old_cap = self._target_cap
+            self._target_cap = self._speed_limit_final_last
+            self._cap_change_timer = 0
+            self._cap_raise_accepted = False
+            if self._target_cap > old_cap:
+              if self._cap_upshift_accept == UpshiftAccept.neverRaise:
+                self._target_cap = old_cap
+              elif self._cap_upshift_accept == UpshiftAccept.accelPedal:
+                if not self._accel_pressed:
+                  self._cap_raise_accepted = True
+                else:
+                  self._target_cap = old_cap
+              else:
+                self._cap_upshift_release_edge()
+            else:
+              self._cap_upshift_release_edge()
+          else:
+            self._cap_upshift_release_edge()
 
         # PENDING
         elif self.state == SpeedLimitAssistState.pending:
-          if self.target_set_speed_confirmed:
-            self._update_confirmed_state()
-          elif self.speed_limit_changed:
-            self.state = SpeedLimitAssistState.preActive
-            self.pre_active_timer = int(PRE_ACTIVE_GUARD_PERIOD[self.pcm_op_long] / DT_MDL)
-
-        # PRE_ACTIVE
-        elif self.state == SpeedLimitAssistState.preActive:
-          if self.target_set_speed_confirmed:
-            self._update_confirmed_state()
-          elif self.pre_active_timer <= 0:
-            # Timeout - session ended
-            self.state = SpeedLimitAssistState.inactive
-
-        # INACTIVE
-        elif self.state == SpeedLimitAssistState.inactive:
-          pass
+          if self._has_speed_limit and not self._cap_below_floor:
+            self._target_cap = self._speed_limit_final_last
+            self._cap_change_timer = 0
+            self._cap_audio_cue_fired = False
+            self._cap_raise_accepted = False
+            self.state = SpeedLimitAssistState.capping
 
     # DISABLED
     elif self.state == SpeedLimitAssistState.disabled:
-      if self.long_enabled and self.enabled:
-        # start or reset preActive timer if initially enabled or manual set speed change detected
-        if not self.long_enabled_prev or self.v_cruise_cluster_changed:
-          self.long_engaged_timer = int(DISABLED_GUARD_PERIOD / DT_MDL)
+      if self.long_enabled and self.enabled and self._cap_suspended_timer <= 0:
+        if self._has_speed_limit and not self._cap_below_floor:
+          self._target_cap = self._speed_limit_final_last
+          self._cap_change_timer = 0
+          self._cap_audio_cue_fired = False
+          self.state = SpeedLimitAssistState.capping
+        else:
+          self.state = SpeedLimitAssistState.pending
 
-        elif self.long_engaged_timer <= 0:
-          if self.target_set_speed_confirmed:
-            self._update_confirmed_state()
-          elif self._has_speed_limit:
-            self.state = SpeedLimitAssistState.preActive
-            self.pre_active_timer = int(PRE_ACTIVE_GUARD_PERIOD[self.pcm_op_long] / DT_MDL)
-          else:
-            self.state = SpeedLimitAssistState.pending
+    if self.state == SpeedLimitAssistState.capping and self._state_prev != SpeedLimitAssistState.capping:
+      if self._cap_audio_cue_enabled:
+        events_sp.add(EventNameSP.speedLimitCapActive)
+        self._cap_audio_cue_fired = True
 
-    enabled = self.state in ENABLED_STATES
-    active = self.state in ACTIVE_STATES
+    enabled = self.state in CAP_ENABLED_STATES
+    active = self.state in CAP_ACTIVE_STATES
 
     return enabled, active
 
@@ -360,13 +413,13 @@ class SpeedLimitAssist:
     return enabled, active
 
   def update_events(self, events_sp: EventsSP) -> None:
-    if self.state == SpeedLimitAssistState.preActive:
+    if not self.pcm_op_long and self.state == SpeedLimitAssistState.preActive:
       events_sp.add(EventNameSP.speedLimitPreActive)
 
     if self.state == SpeedLimitAssistState.pending and self._state_prev != SpeedLimitAssistState.pending:
       events_sp.add(EventNameSP.speedLimitPending)
 
-    if self.is_active:
+    if not self.pcm_op_long and self.is_active:
       if self._state_prev not in ACTIVE_STATES:
         self.update_active_event(events_sp)
 
@@ -379,8 +432,9 @@ class SpeedLimitAssist:
           self.update_active_event(events_sp)
 
   def update(self, long_enabled: bool, long_override: bool, v_ego: float, a_ego: float, v_cruise_cluster: float, speed_limit: float,
-             speed_limit_final_last: float, has_speed_limit: bool, distance: float, events_sp: EventsSP) -> None:
+             speed_limit_final_last: float, has_speed_limit: bool, distance: float, events_sp: EventsSP, accel_pressed: bool = False) -> None:
     self.long_enabled = long_enabled
+    self.long_override = long_override
     self.v_ego = v_ego
     self.a_ego = a_ego
 
@@ -388,13 +442,14 @@ class SpeedLimitAssist:
     self._speed_limit = speed_limit
     self._speed_limit_final_last = speed_limit_final_last
     self._distance = distance
+    self._accel_pressed = accel_pressed
 
     self.update_params()
     self.update_calculations(v_cruise_cluster)
 
     self._state_prev = self.state
     if self.pcm_op_long:
-      self.is_enabled, self.is_active = self.update_state_machine_pcm_op_long()
+      self.is_enabled, self.is_active = self.update_state_machine_cap(events_sp)
     else:
       self.is_enabled, self.is_active = self.update_state_machine_non_pcm_long()
 

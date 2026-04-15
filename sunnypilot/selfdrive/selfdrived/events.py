@@ -216,6 +216,14 @@ EVENTS_SP: dict[int, dict[str, Alert | AlertCallbackType]] = {
       Priority.LOW, VisualAlert.none, AudibleAlertSP.promptSingleHigh, 5.),
   },
 
+  EventNameSP.speedLimitCapActive: {
+    ET.WARNING: Alert(
+      "Speed Limit Capping",
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.LOW, VisualAlert.none, AudibleAlertSP.promptSingleHigh, 5.),
+  },
+
   EventNameSP.speedLimitChanged: {
     ET.WARNING: Alert(
       "Set speed changed",

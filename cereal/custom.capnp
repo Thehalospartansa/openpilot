@@ -267,6 +267,7 @@ struct LongitudinalPlanSP @0xf35cc4560bbf6ec2 {
       active @2 :Bool;
       vTarget @3 :Float32;
       aTarget @4 :Float32;
+      capDelta @5 :Float32; # Difference between cluster set-speed and cap (m/s), positive = driver above cap
     }
 
     enum Source {
@@ -282,6 +283,7 @@ struct LongitudinalPlanSP @0xf35cc4560bbf6ec2 {
       pending @3; # Awaiting new speed limit.
       adapting @4; # Reducing speed to match new speed limit.
       active @5; # Cruising at speed limit.
+      capping @6; # Silently capping speed based on limit.
     }
   }
 
@@ -342,6 +344,7 @@ struct OnroadEventSP @0xda96579883444c35 {
     speedLimitChanged @21;
     speedLimitPending @22;
     e2eChime @23;
+    speedLimitCapActive @24;
   }
 }
 
