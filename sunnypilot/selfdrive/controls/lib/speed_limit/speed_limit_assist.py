@@ -17,7 +17,7 @@ from openpilot.sunnypilot.selfdrive.selfdrived.events import EventsSP
 from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit import PCM_LONG_REQUIRED_MAX_SET_SPEED, CONFIRM_SPEED_THRESHOLD
 from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit.common import Mode, UpshiftAccept
 from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit.helpers import compare_cluster_target, set_speed_limit_assist_availability, \
-  get_min_cap_floor, get_upshift_accept, get_cap_audio_cue_enabled
+  get_min_cap_floor
 
 ButtonType = car.CarState.ButtonEvent.Type
 EventNameSP = custom.OnroadEventSP.EventName
@@ -56,6 +56,7 @@ class SpeedLimitAssist:
   v_ego: float
   a_ego: float
   v_offset: float
+  cap_delta: float
 
   def __init__(self, CP: car.CarParams, CP_SP: custom.CarParamsSP):
     self.params = Params()
@@ -74,6 +75,7 @@ class SpeedLimitAssist:
     self.is_active = False
     self.output_v_target = V_CRUISE_UNSET
     self.output_a_target = 0.
+    self.cap_delta = 0.0
     self.v_ego = 0.
     self.a_ego = 0.
     self.v_offset = 0.
@@ -108,8 +110,8 @@ class SpeedLimitAssist:
     self._cap_raise_accepted = False
     self._accel_pressed = False
     self._min_cap_floor = get_min_cap_floor(self.params, self.is_metric)
-    self._cap_upshift_accept = get_upshift_accept(self.params)
-    self._cap_audio_cue_enabled = get_cap_audio_cue_enabled(self.params)
+    self._cap_upshift_accept = self.params.get("SpeedLimitUpshiftAccept", return_default=True)
+    self._cap_audio_cue_enabled = bool(self.params.get("SpeedLimitCapAudioCue", return_default=True))
 
     # TODO-SP: SLA's own output_a_target for planner
     self.acceleration_solutions = {
@@ -164,9 +166,8 @@ class SpeedLimitAssist:
       set_speed_limit_assist_availability(self.CP, self.CP_SP, self.params)
       self.enabled = self.params.get("SpeedLimitMode", return_default=True) == Mode.assist
       self._min_cap_floor = get_min_cap_floor(self.params, self.is_metric)
-    # Read every frame so settings changes take effect immediately without waiting on PARAMS_UPDATE_PERIOD
-    self._cap_upshift_accept = get_upshift_accept(self.params)
-    self._cap_audio_cue_enabled = get_cap_audio_cue_enabled(self.params)
+      self._cap_upshift_accept = self.params.get("SpeedLimitUpshiftAccept", return_default=True)
+      self._cap_audio_cue_enabled = bool(self.params.get("SpeedLimitCapAudioCue", return_default=True))
 
   def update_car_state(self, CS: car.CarState) -> None:
     now = time.monotonic()
@@ -312,9 +313,9 @@ class SpeedLimitAssist:
             self._cap_change_timer = 0
             self._cap_raise_accepted = False
             if self._target_cap > old_cap:
-              if self._cap_upshift_accept == UpshiftAccept.neverRaise:
+              if self._cap_upshift_accept == UpshiftAccept.NEVER_RAISE:
                 self._target_cap = old_cap
-              elif self._cap_upshift_accept == UpshiftAccept.accelPedal:
+              elif self._cap_upshift_accept == UpshiftAccept.ACCEL_PEDAL:
                 if not self._accel_pressed:
                   self._cap_raise_accepted = True
                 else:
@@ -465,5 +466,10 @@ class SpeedLimitAssist:
 
     self.output_v_target = self.get_v_target_from_control()
     self.output_a_target = self.get_a_target_from_control()
+
+    if self.pcm_op_long and self.state == SpeedLimitAssistState.capping:
+      self.cap_delta = max(0.0, self.v_cruise_cluster - self._target_cap)
+    else:
+      self.cap_delta = 0.0
 
     self.frame += 1

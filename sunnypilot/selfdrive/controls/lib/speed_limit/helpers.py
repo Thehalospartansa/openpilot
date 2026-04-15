@@ -9,7 +9,7 @@ from cereal import custom, car
 from openpilot.common.constants import CV
 from openpilot.common.params import Params
 from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit.common import Mode as SpeedLimitMode
-from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit import MIN_CAP_FLOOR_MAX_MPH, MIN_CAP_FLOOR_MAX_KPH
+from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit import MIN_CAP_FLOOR_MAX
 
 
 def compare_cluster_target(v_cruise_cluster: float, target_set_speed: float, is_metric: bool) -> tuple[bool, bool]:
@@ -47,14 +47,5 @@ def set_speed_limit_assist_availability(CP: car.CarParams, CP_SP: custom.CarPara
 
 def get_min_cap_floor(params: Params, is_metric: bool) -> float:
   value = params.get("SpeedLimitMinCapFloor", return_default=True)
-  if is_metric:
-    return min(MIN_CAP_FLOOR_MAX_KPH, max(0, value)) * CV.KPH_TO_MS
-  return min(MIN_CAP_FLOOR_MAX_MPH, max(0, value)) * CV.MPH_TO_MS
-
-
-def get_upshift_accept(params: Params) -> int:
-  return params.get("SpeedLimitUpshiftAccept", return_default=True)
-
-
-def get_cap_audio_cue_enabled(params: Params) -> bool:
-  return params.get_bool("SpeedLimitCapAudioCue")
+  value = max(0, min(value, MIN_CAP_FLOOR_MAX[is_metric]))
+  return value * (CV.KPH_TO_MS if is_metric else CV.MPH_TO_MS)

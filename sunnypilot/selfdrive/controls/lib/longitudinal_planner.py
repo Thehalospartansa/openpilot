@@ -132,11 +132,7 @@ class LongitudinalPlannerSP:
     assist.active = self.sla.is_active
     assist.vTarget = float(self.sla.output_v_target)
     assist.aTarget = float(self.sla.output_a_target)
-    if self.sla.pcm_op_long and self.sla.state == custom.LongitudinalPlanSP.SpeedLimit.AssistState.capping:
-      v_cruise_cluster_ms = sm['carState'].vCruiseCluster * CV.KPH_TO_MS
-      assist.capDelta = float(max(0, v_cruise_cluster_ms - self.sla._target_cap))
-    else:
-      assist.capDelta = 0.0
+    assist.capDelta = float(self.sla.cap_delta)
 
     # E2E Alerts
     e2eAlerts = longitudinalPlanSP.e2eAlerts

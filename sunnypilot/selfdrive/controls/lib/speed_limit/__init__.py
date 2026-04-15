@@ -18,5 +18,7 @@ CONFIRM_SPEED_THRESHOLD = {
   False: 50,  # mph
 }
 
-MIN_CAP_FLOOR_MAX_MPH = 40
-MIN_CAP_FLOOR_MAX_KPH = 64
+MIN_CAP_FLOOR_MAX = {
+  True: 64,   # km/h
+  False: 40,  # mph
+}

@@ -186,7 +186,7 @@ class SpeedLimitSettingsLayout(Widget):
       brand = ui_state.CP.brand
       has_long = ui_state.has_longitudinal_control
       has_icbm = ui_state.has_icbm
-      pcm_op_long = ui_state.CP.openpilotLongitudinalControl and ui_state.CP.pcmCruise
+      pcm_op_long = has_long and ui_state.CP.pcmCruise
 
       """
           Speed Limit Assist is available when:

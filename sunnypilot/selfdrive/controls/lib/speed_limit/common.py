@@ -30,5 +30,5 @@ class Mode(IntEnumBase):
 
 
 class UpshiftAccept(IntEnumBase):
-  neverRaise = 0
-  accelPedal = 1
+  NEVER_RAISE = 0
+  ACCEL_PEDAL = 1

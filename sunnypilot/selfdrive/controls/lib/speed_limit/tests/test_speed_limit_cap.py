@@ -111,7 +111,7 @@ class TestSpeedLimitCapMode:
   def test_change_debounce_hold_new_limit(self, scenario_builder):
     """FSM: New speed limit held for 1s before accepting (debounce)."""
     scenario = scenario_builder()
-    scenario.set_param("SpeedLimitUpshiftAccept", UpshiftAccept.accelPedal)
+    scenario.set_param("SpeedLimitUpshiftAccept", UpshiftAccept.ACCEL_PEDAL)
     scenario.set_state(SpeedLimitAssistState.capping)
     scenario.set_engaged(True)
     scenario.set_speed_limits(25 * CV.MPH_TO_MS, 0)
@@ -150,9 +150,9 @@ class TestSpeedLimitCapMode:
     assert scenario.sla.state == SpeedLimitAssistState.capping
 
   def test_upshift_never_raise_keeps_old_cap(self, scenario_builder):
-    """FSM: neverRaise mode keeps cap unchanged when limit increases."""
+    """FSM: NEVER_RAISE mode keeps cap unchanged when limit increases."""
     scenario = scenario_builder()
-    scenario.set_param("SpeedLimitUpshiftAccept", UpshiftAccept.neverRaise)
+    scenario.set_param("SpeedLimitUpshiftAccept", UpshiftAccept.NEVER_RAISE)
     scenario.set_state(SpeedLimitAssistState.capping)
     scenario.set_engaged(True)
     scenario.set_speed_limits(25 * CV.MPH_TO_MS, 0)
@@ -169,14 +169,14 @@ class TestSpeedLimitCapMode:
         True, 0, scenario.events_sp
       )
 
-    # In neverRaise mode, cap stays at 25 mph (old value)
+    # In NEVER_RAISE mode, cap stays at 25 mph (old value)
     assert abs(scenario.sla._target_cap - 25 * CV.MPH_TO_MS) < 0.1
     assert scenario.sla.state == SpeedLimitAssistState.capping
 
   def test_upshift_accel_pedal_requires_release(self, scenario_builder):
-    """FSM: accelPedal mode accepts new cap only on pedal release."""
+    """FSM: ACCEL_PEDAL mode accepts new cap only on pedal release."""
     scenario = scenario_builder()
-    scenario.set_param("SpeedLimitUpshiftAccept", UpshiftAccept.accelPedal)
+    scenario.set_param("SpeedLimitUpshiftAccept", UpshiftAccept.ACCEL_PEDAL)
     scenario.set_state(SpeedLimitAssistState.capping)
     scenario.set_engaged(True)
     scenario.set_speed_limits(25 * CV.MPH_TO_MS, 0)
@@ -200,7 +200,7 @@ class TestSpeedLimitCapMode:
   def test_pedal_release_debounce_200ms(self, scenario_builder):
     """FSM: Accel pedal release edge requires 200ms debounce."""
     scenario = scenario_builder()
-    scenario.set_param("SpeedLimitUpshiftAccept", UpshiftAccept.accelPedal)
+    scenario.set_param("SpeedLimitUpshiftAccept", UpshiftAccept.ACCEL_PEDAL)
     scenario.set_state(SpeedLimitAssistState.capping)
     scenario.set_engaged(True)
     scenario.set_speed_limits(25 * CV.MPH_TO_MS, 0)
@@ -337,13 +337,12 @@ class TestSpeedLimitCapMode:
       True, 0, scenario.events_sp
     )
 
-    # v_target = min(cruise, cap) = 25 mph (cruise above cap -> capped)
     assert abs(scenario.sla.output_v_target - limit_ms) < 0.1
-    # target_cap tracks posted limit; delta published to cereal = max(0, cruise - target_cap) = 10 mph
     assert abs(scenario.sla._target_cap - limit_ms) < 0.1
     cap_delta = max(0., cruise_ms - scenario.sla._target_cap)
     assert cap_delta > 0
     assert abs(cap_delta - 10 * CV.MPH_TO_MS) < 0.1
+    assert abs(scenario.sla.cap_delta - cap_delta) < 0.1
     assert scenario.sla.state == SpeedLimitAssistState.capping
 
   def test_min_cap_floor_zero_disables_pause(self, scenario_builder):
@@ -536,16 +535,15 @@ class TestSpeedLimitCapMode:
     assert scenario.sla.state == SpeedLimitAssistState.pending
     assert scenario.sla.output_v_target == V_CRUISE_UNSET
 
-  def test_param_hot_flip_pcm_op_long_no_op(self, scenario_builder):
-    """Edge case #18: Settings flip mid-drive (pcm_op_long cars forced to cap)."""
+  def test_mode_param_off_disables_sla_on_pcm_op_long(self, scenario_builder):
+    """Edge case #18: SpeedLimitMode controls engagement on pcm_op_long cars."""
     scenario = scenario_builder()
     scenario.set_state(SpeedLimitAssistState.disabled)
     scenario.set_engaged(True)
     scenario.set_speed_limits(25 * CV.MPH_TO_MS, 0)
     scenario.set_cruise_speeds(20 * CV.MPH_TO_MS)
 
-    # Even if someone tries to flip engagement param (should be ignored for pcm_op_long)
-    scenario.set_param("SpeedLimitMode", 0)  # Try to disable
+    scenario.set_param("SpeedLimitMode", 0)
 
     scenario.sla.update(
       True, False, 25 * CV.MPH_TO_MS, 0,
@@ -553,8 +551,7 @@ class TestSpeedLimitCapMode:
       True, 0, scenario.events_sp
     )
 
-    # pcm_op_long forced to cap; param is read-only for engagement
-    assert scenario.sla.state == SpeedLimitAssistState.capping
+    assert scenario.sla.state == SpeedLimitAssistState.disabled
 
   def test_speed_limit_final_zero_with_has_limit_edge(self, scenario_builder):
     """Edge case #19: has_speed_limit=true but speed_limit_final=0 -> pending."""

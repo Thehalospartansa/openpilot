@@ -15,6 +15,7 @@ from openpilot.common.params import Params
 from openpilot.sunnypilot.selfdrive.car import interfaces as sunnypilot_interfaces
 from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit.speed_limit_assist import SpeedLimitAssist
 from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit.common import Mode
+from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit.helpers import get_min_cap_floor
 from openpilot.sunnypilot.selfdrive.selfdrived.events import EventsSP
 
 SpeedLimitAssistState = custom.LongitudinalPlanSP.SpeedLimit.AssistState
@@ -80,6 +81,18 @@ class SpeedLimitAssistScenario:
       self.params.put(key, value)
     else:
       self.params.put(key, str(value) if not isinstance(value, str) else value)
+
+    # Runtime caches these behind PARAMS_UPDATE_PERIOD; force-sync for tests
+    if key == "SpeedLimitMinCapFloor":
+      self.sla._min_cap_floor = get_min_cap_floor(self.sla.params, self.sla.is_metric)
+    elif key == "SpeedLimitUpshiftAccept":
+      self.sla._cap_upshift_accept = self.sla.params.get("SpeedLimitUpshiftAccept", return_default=True)
+    elif key == "SpeedLimitCapAudioCue":
+      self.sla._cap_audio_cue_enabled = bool(self.sla.params.get("SpeedLimitCapAudioCue", return_default=True))
+    elif key == "SpeedLimitMode":
+      self.sla.enabled = self.sla.params.get("SpeedLimitMode", return_default=True) == Mode.assist
+    elif key == "IsMetric":
+      self.sla.is_metric = self.sla.params.get_bool("IsMetric")
     return self
 
   def clear_events(self) -> "SpeedLimitAssistScenario":
