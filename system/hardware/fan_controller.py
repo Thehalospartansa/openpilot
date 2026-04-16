@@ -10,7 +10,7 @@ class FanController:
     self.controller = PIDController(k_p=0, k_i=4e-3, rate=rate)
 
   def update(self, cur_temp: float, ignition: bool) -> int:
-    self.controller.pos_limit = 100 if ignition else 100
+    self.controller.pos_limit = 100 if ignition else 25
     self.controller.neg_limit = 25 if ignition else 0
 
     if ignition != self.last_ignition:
@@ -19,5 +19,5 @@ class FanController:
 
     return int(self.controller.update(
                  error=(cur_temp - 50),  # temperature setpoint in C
-                 feedforward=np.interp(cur_temp, [45, 60], [0, 100])
+                 feedforward=np.interp(cur_temp, [40, 60], [0, 100])
               ))
