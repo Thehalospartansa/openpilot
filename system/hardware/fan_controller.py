@@ -10,7 +10,7 @@ class FanController:
     self.controller = PIDController(k_p=0, k_i=4e-3, rate=rate)
 
   def update(self, cur_temp: float, ignition: bool) -> int:
-    return 100
+    return 25
 
     if ignition != self.last_ignition:
       self.controller.reset()
