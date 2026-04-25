@@ -90,7 +90,7 @@ class HudRendererSP(HudRenderer):
     if self.is_cruise_set:
       set_speed_color = COLORS.WHITE
       if long_plan_sp.speedLimit.assist.active:
-        set_speed_color = SLA_ACTIVE_COLOR if long_override else rl.Color(0, 0xff, 0, 0xff)
+        set_speed_color = SLA_ACTIVE_COLOR if long_override else rl.Color(0xff, 0, 0xff, 0xff)
         max_color = SLA_ACTIVE_COLOR if long_override else rl.Color(0x80, 0xd8, 0xa6, 0xff)
       else:
         if ui_state.status == UIStatus.ENGAGED:
