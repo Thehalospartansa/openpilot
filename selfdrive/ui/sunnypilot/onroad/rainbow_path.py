@@ -12,7 +12,7 @@ from openpilot.system.ui.lib.shader_polygon import draw_polygon, Gradient
 
 class RainbowPath:
   DEFAULT_NUM_SEGMENTS = 32 #default is 8
-  DEFAULT_SPEED = 36  # degrees per second
+  DEFAULT_SPEED = 72  # degrees per second
   DEFAULT_SATURATION = 1
   DEFAULT_LIGHTNESS = 0.6
   BASE_ALPHA = 0.8
