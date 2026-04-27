@@ -15,8 +15,8 @@ class RainbowPath:
   DEFAULT_SPEED = 72  # degrees per second
   DEFAULT_SATURATION = 1
   DEFAULT_LIGHTNESS = 0.6
-  BASE_ALPHA = 0.8
-  ALPHA_FADE = 0.3  # Alpha reduction from bottom to top
+  BASE_ALPHA = 0.75
+  ALPHA_FADE = 0.5  # Alpha reduction from bottom to top
 
   def __init__(self, num_segments: int = DEFAULT_NUM_SEGMENTS, speed: float = DEFAULT_SPEED,
                saturation: float = DEFAULT_SATURATION, lightness: float = DEFAULT_LIGHTNESS):
